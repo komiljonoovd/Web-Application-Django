@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Класс | EVRIKA SCHOOL</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #181818;
+            color: #fff;
+            padding: 20px;
+        }
+        h2 {
+            color: #4CAF50; /* Цвет заголовка */
+            margin-top: -50px; /* Поднимаем заголовок */
+            font-size: 28px; /* Увеличиваем размер шрифта */
+            border-bottom: 2px solid #4CAF50; /* Подчеркивание заголовка */
+            padding-bottom: 10px; /* Отступ снизу для визуального эффекта */
+        }
+        .back-button {
+            background: none;
+            border: none;
+            color: #4CAF50;
+            font-size: 24px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .refresh-button {
+            background-color: #000; /* Черный фон */
+            color: #4CAF50; /* Зеленый текст */
+            border: none;
+            border-radius: 50%;
+            width: 50px; /* Размер кнопки */
+            height: 50px; /* Размер кнопки */
+            font-size: 24px; /* Размер иконки */
+            cursor: pointer;
+            position: absolute;
+            top: 20px; /* Положение сверху */
+            right: 20px; /* Положение справа */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s; /* Плавный эффект при наведении */
+        }
+        .refresh-button:hover {
+            transform: scale(1.1); /* Увеличение кнопки при наведении */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 8px;
+            text-align: left;
+            cursor: pointer;
+        }
+        th {
+            background: #555;
+        }
+        .button-container {
+            margin-bottom: 20px;
+        }
+        button {
+            margin-right: 10px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+<!--        button:hover:not(:disabled) {-->
+<!--            background-color: #45a049;-->
+<!--        }-->
+        input[type="text"], select {
+            padding: 10px;
+            margin-left: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .no-data {
+            text-align: center;
+            color: white;
+            margin-top: 10px;
+            height:300px;
+        }
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .pagination {
+            text-align: left;
+        }
+        .pagination a {
+            margin: 0 5px;
+            text-decoration: none;
+            color: #4CAF50;
+            padding: 5px 10px;
+            border: 1px solid #4CAF50;
+            border-radius: 5px;
+        }
+        .pagination .current {
+            margin: 0 5px;
+            padding: 5px 10px;
+            font-weight: bold;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+        }
+        .rows-per-page {
+            text-align: right;
+        }
+        .notification, .error-notification {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1000;
+            text-align: center;
+        }
+        .notification {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .error-notification {
+            background-color: #f44336;
+            color: white;
+        }
+        .status-icon {
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .action-buttons button {
+            margin-right: 10px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white; /* Text color */
+}
+
+.action-buttons .link,
+.action-buttons .delete,
+.action-buttons .restore {
+    background-color: #555; /* Default color */
+}
+
+.action-buttons .link:disabled,
+.action-buttons .delete:disabled,
+.action-buttons .restore:disabled,
+.action-buttons .unlink:disabled {
+    background-color: #777; /* Disabled color */
+    cursor: not-allowed;
+}
+
+.action-buttons .pressable {
+    background-color: #4CAF50; /* Active color when pressable */
+}
+
+.action-buttons .pressable:disabled {
+    background-color: #777; /* Disabled color */
+}
+    </style>
+</head>
+<body>
+
+<button class="back-button" onclick="window.location.href='/evika-school/'"><i class="fas fa-chevron-left"></i> Назад</button>
+<div class="content" id="tableContainer">
+
+    <center><h2>Классы <i class="fas fa-chalkboard"></i> </h2></center>
+    <button class="refresh-button" onclick="refreshPage()">
+        <i class="fas fa-sync"></i>
+    </button>
+    <div class="button-container">
+        <button id="addButton" onclick="addClass()">+ New</button>
+        <button id="deleteButton" onclick="deleteClasses()" disabled>Удалить</button>
+        <button id="restoreButton" onclick="restoreClasses()" disabled>Восстановить</button>
+        <button id="raiseNumberButton" onclick="raiseNumber()" disabled>Поднять номер</button>
+        <button id="archiveButton" onclick="archiveClasses()" disabled>Архивировать</button>
+        <input type="text" id="search" placeholder="Поиск..." value="{{ search_query }}">
+        <button id="searchButton" onclick="searchClasses()">Искать</button>
+    </div>
+    <table id="classesTable">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
+                <th><center>Number</center></th>
+                <th><center>Letter</center></th>
+                <th><center>Is In Process</center></th>
+                <th><center>Teacher</center></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if page_obj %}
+                {% for class in page_obj %}
+                <tr data-id="{{ class.id }}">
+                    <td><input type="checkbox" name="selectClass" value="{{ class.id }}" onchange="updateButtonStates()"></td>
+                    <td class="link" onclick="editClass({{ class.id }})">{{ class.number }}</td>
+                    <td class="link" onclick="editClass({{ class.id }})">{{ class.letter }}</td>
+                    <td><center>
+                        <span class="status-icon" onclick="editClass({{ class.id }})">
+                            {% if class.isactive %}
+                            <i class="fas fa-check-square" style="color: #4CAF50" ></i>
+                            {% else %}
+                            <i class="fas fa-times-circle" style="color: #f44336;"></i>
+                            {% endif %}
+                        </span>
+                    </center>
+                    </td>
+                    <td class="link" onclick="editClass({{ class.id }})">{{ class.teacher|default:"" }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="5" class="no-data"><center>NO DATA TO DISPLAY</center></td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    <div class="pagination-container">
+        <div class="pagination">
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="current">{{ num }}</span>
+                {% else %}
+                    <a href="?page={{ num }}&rows_per_page={{ rows_per_page }}&search={{ search_query }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="rows-per-page">
+            <label for="rowsPerPage">Page size:</label>
+            <select id="rowsPerPage" onchange="changeRowsPerPage()">
+                <option value="5" {% if rows_per_page == 5 %}selected{% endif %}>5</option>
+                <option value="10" {% if rows_per_page == 10 %}selected{% endif %}>10</option>
+                <option value="20" {% if rows_per_page == 20 %}selected{% endif %}>20</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">Успешное изменение классов.</div>
+    <div class="error-notification" id="errorNotification">Ошибка при изменении классов.</div>
+</div>
+
+<script>
+function goBack() {
+    window.location.href = '/evika-school/';
+}
+
+function refreshPage() {
+    location.reload();
+}
+
+function addClass() {
+    window.location.href = '/evika-school/add-class/';
+}
+
+function editClass(id) {
+    window.location.href = `/evika-school/edit-class/${id}/`;
+}
+
+function toggleAll(source) {
+    const checkboxes = document.getElementsByName('selectClass');
+    checkboxes.forEach((checkbox) => {
+        checkbox.checked = source.checked;
+    });
+    updateButtonStates();
+}
+
+function updateButtonStates() {
+    const selectedClasses = document.querySelectorAll('input[name="selectClass"]:checked');
+    const deleteButton = document.getElementById('deleteButton');
+    const restoreButton = document.getElementById('restoreButton');
+    const raiseNumberButton = document.getElementById('raiseNumberButton');
+    const archiveButton = document.getElementById('archiveButton');
+
+    deleteButton.disabled = selectedClasses.length === 0;
+    restoreButton.disabled = selectedClasses.length === 0;
+    raiseNumberButton.disabled = selectedClasses.length === 0;
+    archiveButton.disabled = selectedClasses.length === 0;
+}
+
+function deleteClasses() {
+    const selectedClasses = Array.from(document.querySelectorAll('input[name="selectClass"]:checked')).map(checkbox => checkbox.value);
+
+    if (selectedClasses.length === 0) {
+        alert('Пожалуйста, выберите хотя бы один класс для удаления.');
+        return;
+    }
+
+    fetch(`/evika-school/delete-classes/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            'ids[]': selectedClasses
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(data.error || 'Неизвестная ошибка');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        showNotification(data.message);
+        setTimeout(() => location.reload(), 2000);
+    })
+    .catch(error => {
+        showErrorNotification(error.message);
+    });
+}
+
+function restoreClasses() {
+    const selectedClasses = Array.from(document.querySelectorAll('input[name="selectClass"]:checked')).map(checkbox => checkbox.value);
+
+    if (selectedClasses.length === 0) {
+        alert('Пожалуйста, выберите хотя бы один класс для восстановления.');
+        return;
+    }
+
+    fetch(`/evika-school/restore-classes/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            'ids[]': selectedClasses
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(data.error || 'Неизвестная ошибка');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        showNotification(data.message);
+        setTimeout(() => location.reload(), 2000);
+    })
+    .catch(error => {
+        showErrorNotification(error.message);
+    });
+}
+
+function raiseNumber() {
+    const selectedClasses = Array.from(document.querySelectorAll('input[name="selectClass"]:checked')).map(checkbox => checkbox.value);
+
+    if (selectedClasses.length === 0) {
+        alert('Пожалуйста, выберите хотя бы один класс для поднятия номера.');
+        return;
+    }
+
+    fetch(`/evika-school/raise-number/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            'ids[]': selectedClasses
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(data.error || 'Неизвестная ошибка');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        showNotification(data.messages.join('<br>'));
+        setTimeout(() => location.reload(), 2000);
+    })
+    .catch(error => {
+        showErrorNotification(error.message);
+    });
+}
+
+function archiveClasses() {
+    const selectedClasses = Array.from(document.querySelectorAll('input[name="selectClass"]:checked')).map(checkbox => checkbox.value);
+
+    if (selectedClasses.length === 0) {
+        alert('Пожалуйста, выберите хотя бы один класс для архивирования.');
+        return;
+    }
+
+    fetch(`/evika-school/archive-classes/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            'ids[]': selectedClasses
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(data.error || 'Неизвестная ошибка');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        showNotification(data.message);
+        setTimeout(() => location.reload(), 2000);
+    })
+    .catch(error => {
+        showErrorNotification(error.message);
+    });
+}
+
+function showNotification(message) {
+    const notification = document.getElementById('notification');
+    notification.innerHTML = message;
+    notification.style.display = 'block';
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
+}
+
+function showErrorNotification(message) {
+    const errorNotification = document.getElementById('errorNotification');
+    errorNotification.innerHTML = message;
+    errorNotification.style.display = 'block';
+    setTimeout(() => {
+        errorNotification.style.display = 'none';
+    }, 3000);
+}
+
+function searchClasses() {
+    const searchQuery = document.getElementById('search').value;
+    window.location.href = `?search=${encodeURIComponent(searchQuery)}`;
+}
+
+function changeRowsPerPage() {
+    const rowsPerPage = document.getElementById('rowsPerPage').value;
+    window.location.href = `?rows_per_page=${rowsPerPage}`;
+}
+</script>
+
+</body>
+</html>

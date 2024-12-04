@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавить класс | EVRIKA SCHOOL</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #181818;
+            color: #fff;
+            padding: 20px;
+        }
+        h2 {
+            color: #4CAF50;
+            margin-top: -40px;
+            font-size: 28px;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .back-button {
+            padding: 10px 15px;
+            font-size: 16px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .delete-button, .save-button {
+            padding: 10px 15px;
+            font-size: 16px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            }
+        .back-button {
+            background-color: #4CAF50;
+        }
+        .delete-button {
+            background-color: #f44336;
+        }
+        .save-button {
+            background-color: #4CAF50;
+        }
+        .delete-button:hover {
+            background-color: #d32f2f;
+        }
+        .form-group {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            width: 200px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+        }
+        input[type="text"], select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            flex-grow: 1;
+        }
+        #notification, #errorNotification {
+           display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1000;
+        }
+        #notification {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #errorNotification {
+            background-color: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="button-container">
+    <button type="button" class="back-button" onclick="window.location.href='/evika-school/classes/'">
+        <i class="fas fa-chevron-left"></i> Назад
+    </button>
+    <div>
+        <button type="button" class="delete-button" onclick="goBack()">Удалить</button>
+        <button type="submit" form="addClassForm" class="save-button">Сохранить</button>
+    </div>
+</div>
+
+<center><h2>Добавить класс</h2></center>
+
+<form id="addClassForm" method="post" action="{% url 'add_class' %}">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="id_number">Number:</label>
+        {{ form.number }}
+    </div>
+
+    <div class="form-group">
+        <label for="id_letter">Letter:</label>
+        {{ form.letter }}
+    </div>
+
+    <div class="form-group">
+        <label for="id_isactive">Is Active:</label>
+        {{ form.isactive }}
+    </div>
+
+    <div class="form-group">
+        <label for="id_teacher">Teacher:</label>
+        {{ form.teacher }}
+    </div>
+
+    <div class="form-group">
+        <label for="id_isdeleted">Is Deleted:</label>
+        {{ form.isdeleted }}
+    </div>
+</form>
+
+<div id="notification">Класс успешно добавлен.</div>
+<div id="errorNotification">Ошибка при добавлении класса.</div>
+
+<script>
+    const form = document.getElementById('addClassForm');
+    form.onsubmit = function(e) {
+        e.preventDefault();
+
+        fetch(form.action, {
+            method: form.method,
+            body: new FormData(form),
+        })
+        .then(response => {
+            if (response.ok) {
+                document.getElementById('notification').style.display = 'block';
+                setTimeout(() => {
+                    window.location.href = '/evika-school/classes/';
+                }, 500);
+            } else {
+                return response.json().then(data => {
+                    const errorMessage = data.errors || 'Неизвестная ошибка';
+                    document.getElementById('errorNotification').innerText = errorMessage;
+                    document.getElementById('errorNotification').style.display = 'block';
+
+                    setTimeout(() => {
+                        document.getElementById('errorNotification').style.display = 'none';
+                    }, 2000);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            document.getElementById('errorNotification').innerText = 'Ошибка при связи с сервером.';
+            document.getElementById('errorNotification').style.display = 'block';
+
+            setTimeout(() => {
+                document.getElementById('errorNotification').style.display = 'none';
+            }, 2000);
+        });
+    };
+
+    function goBack() {
+        window.location.href = '/evika-school/classes/';
+    }
+</script>
+
+</body>
+</html>

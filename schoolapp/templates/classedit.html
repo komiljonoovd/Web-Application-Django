@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование класса | EVRIKA SCHOOL</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #181818;
+            color: #fff;
+            padding: 20px;
+        }
+        h2 {
+            color: #4CAF50;
+            margin-top: -70px;
+            font-size: 28px;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .back-button {
+            background: none;
+            border: none;
+            color: #4CAF50;
+            font-size: 24px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            width: 200px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+        }
+        input[type="text"], select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            flex-grow: 1;
+        }
+        button {
+            margin-right: 10px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .action-buttons button {
+            background-color: #555;
+            color: white;
+        }
+        .action-buttons button:hover {
+            background-color: #666;
+        }
+        .save {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .save:hover {
+            background-color: #388E3C;
+        }
+        .delete {
+            background-color: #e53935;
+            color: white;
+        }
+        .delete:hover {
+            background-color: #c62828;
+        }
+        .notification {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1000;
+        }
+        .notification.success {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .notification.error {
+            background-color: #e53935;
+            color: white;
+        }
+        .info-field {
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #666;
+        }
+        .pupil-table {
+            margin-top: 30px;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .pupil-table th, .pupil-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        .pupil-table th {
+            background-color: #333;
+        }
+        .no-students {
+            text-align: center;
+            font-weight: bold;
+            height: 222px;
+            vertical-align: middle;
+            colspan: 6;
+        }
+        #searchInput {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 200px;
+            margin-left: 10px;
+        }
+        .search-button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #555;
+            color: white;
+            margin-left: 10px;
+        }
+        .search-button:hover {
+            background-color: #666;
+        }
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .pagination {
+            display: flex;
+        }
+        .pagination a {
+            margin: 0 5px;
+            text-decoration: none;
+            color: #4CAF50;
+            padding: 5px 10px;
+            border: 1px solid #4CAF50;
+            border-radius: 5px;
+        }
+        .pagination .current {
+            margin: 0 5px;
+            padding: 5px 10px;
+            font-weight: bold;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+        }
+        .rows-per-page {
+            text-align: right;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            z-index: 1000;
+            max-width: 80%;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+        .modal.open {
+            display: block;
+        }
+        .modal-header {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <button class="back-button" onclick="window.location.href='/evika-school/classes/'">
+        <i class="fas fa-chevron-left"></i> Назад
+    </button>
+    <div>
+        <button type="button" class="delete" onclick="confirmDelete()">Удалить</button>
+        <button type="button" class="save" onclick="submitForm()">Сохранить</button>
+    </div>
+</div>
+
+<center><h2>Редактирование  <i class="fas fa-edit"></i></h2></center>
+
+<div id="notification" class="notification"></div>
+
+<form id="editClassForm" method="post" action="{% url 'edit_class' class_instance.id %}">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="id_number">Number:</label>
+        {{ form.number }}
+    </div>
+    <div class="form-group">
+        <label for="id_letter">Letter:</label>
+        {{ form.letter }}
+    </div>
+    <div class="form-group">
+        <label for="id_isactive">Is In Process:</label>
+        {{ form.isactive }}
+    </div>
+    <div class="form-group">
+        <label for="id_teacher">Teacher:</label>
+        {{ form.teacher }}
+    </div>
+    <div class="form-group">
+        <label for="id_isdeleted">Is Deleted:</label>
+        {{ form.isdeleted }}
+    </div>
+    <div class="form-group">
+        <label>Создано:</label>
+        <input type="text" id="editCreatedBy" value="{{ created_by }}  {{ created_on|date:'D, d M Y H:i' }}" class="info-field" disabled>
+    </div>
+    <div class="form-group">
+        <label>Изменено:</label>
+        <input type="text" id="editModifiedBy" value="{{ modified_by }}  {{ modified_on|date:'D, d M Y H:i' }}" class="info-field" disabled>
+    </div>
+</form>
+
+<center><h3>Список учеников</h3></center>
+<div class="action-buttons">
+    <button type="button" class="save" onclick="window.location.href='/evika-school/add-pupil/'">+ New</button>
+    <button type="button" class="link" id="linkButton" onclick="showLinkModal()">Link</button>
+    <button type="button" class="unlink" id="unlinkButton" onclick="showUnlinkModal()" disabled>Unlink</button>
+    <button type="button" class="delete" id="deleteButton" onclick="deleteSelectedPupils()" disabled>Удалить</button>
+    <button type="button" class="restore" id="restoreButton" onclick="restoreSelectedPupils()" disabled>Восстановить</button>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Поиск ученика...">
+        <button class="search-button" onclick="filterPupils()">Искать</button>
+    </div>
+</div>
+
+<!-- Модальное окно для отображения списка неподвязанных учеников -->
+<div id="linkModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeLinkModal()">&times;</span>
+        <h2>Неподвязанные ученики</h2>
+
+        <!-- Кнопка "+ New" и строка поиска -->
+        <div class="modal-header">
+            <button type="button" class="new-button" onclick="createNewPupil()">+ New</button>
+            <input type="text" id="searchInput" placeholder="Поиск учеников или учениц..." oninput="fetchPupils()">
+        </div>
+
+        <!-- Таблица учеников -->
+        <table>
+            <thead>
+                <tr>
+                    <th><center>Full Name<center></th>
+                </tr>
+            </thead>
+            <tbody id="pupilsTableBody">
+            </tbody>
+        </table>
+
+        <!-- Пагинация -->
+        <div class="pagination-container">
+            <div class="pagination" id="paginationLinks">
+                <!-- Числовая пагинация будет загружена через JavaScript -->
+            </div>
+            <div class="rows-per-page">
+                <label for="rowsPerPage">Page size:</label>
+                <select id="rowsPerPage" onchange="fetchPupils()">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Кнопка для привязки выбранных учеников -->
+        <button type="button" onclick="linkSelectedPupils()">Привязать выбранных учеников</button>
+    </div>
+</div>
+
+
+<table class="pupil-table">
+    <thead>
+        <tr>
+            <th><input type="checkbox" onclick="toggleSelectAll(this)"></th>
+            <th><center>First name</center></th>
+            <th><center>Last name</center></th>
+            <th><center>Surname</center></th>
+            <th><center>Gender</center></th>
+            <th><center>Birthday</center></th>
+        </tr>
+    </thead>
+    <tbody>
+         {% for pupil in pupils %}
+    <tr ondblclick="redirectToEditPage({{ pupil.id }})">
+        <td>
+            <input type="checkbox" class="pupil-checkbox" value="{{ pupil.id }}"
+                   onchange="toggleButtonStates()" onclick="event.stopPropagation(); toggleButtonStates(event)">
+        </td>
+        <td>{{ pupil.first_name }}</td>
+        <td>{{ pupil.last_name }}</td>
+        <td>{{ pupil.surname|default:"" }}</td>
+        <td>{{ pupil.gender }}</td>
+        <td>{{ pupil.birthday|date:'d.m.Y' }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="no-students"><center>NO DATA TO DISPLAY</center></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Пагинация под таблицей -->
+<div class="pagination-container">
+    <div class="pagination">
+        {% for num in pupils.paginator.page_range %}
+            {% if pupils.number == num %}
+                <span class="current">{{ num }}</span>
+            {% else %}
+                <a href="?page={{ num }}&rows_per_page={{ rows_per_page }}&search={{ search_query }}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div class="rows-per-page">
+        <label for="rowsPerPage">Page size:</label>
+        <select id="rowsPerPage" onchange="updateRowsPerPage(this.value)">
+            <option value="5" {% if rows_per_page == 5 %}selected{% endif %}>5</option>
+            <option value="10" {% if rows_per_page == 10 %}selected{% endif %}>10</option>
+            <option value="20" {% if rows_per_page == 20 %}selected{% endif %}>20</option>
+        </select>
+    </div>
+</div>
+<script>
+function redirectToEditPage(pupilId) {
+ window.location.href = `/evika-school/edit-pupil/${pupilId}/`;
+
+}
+</script>
+<script>
+
+function goBack() {
+    window.history.back();
+}
+
+
+// Функция для отображения модального окна
+function showLinkModal() {
+    document.getElementById("linkModal").style.display = "block";
+    fetchPupils();  // Загрузка списка учеников при открытии
+}
+
+// Функция для закрытия модального окна
+function closeLinkModal() {
+    document.getElementById("linkModal").style.display = "none";
+}
+
+// Функция для создания нового ученика
+function createNewPupil() {
+    // Логика для создания нового ученика (возможно, перенаправление на форму создания)
+    console.log("Создание нового ученика");
+}
+
+// Функция для загрузки списка учеников с учетом пагинации и поиска
+function fetchPupils(page = 1) {
+    const searchQuery = document.getElementById("searchInput").value;
+    const rowsPerPage = document.getElementById("rowsPerPage").value;
+
+    fetch(`evika-school/not-linked-pupils/?page=${page}&rows_per_page=${rowsPerPage}&search=${searchQuery}`)
+        .then(response => response.json())
+        .then(data => {
+            const pupilsTableBody = document.getElementById("pupilsTableBody");
+            const paginationLinks = document.getElementById("paginationLinks");
+
+            // Заполнение таблицы данными учеников
+            pupilsTableBody.innerHTML = data.pupils.map(pupil => `
+                <tr>
+                    <td>${pupil.last_name} ${pupil.first_name} ${pupil.surname}</td>
+                    <td>${pupil.gender}</td>
+                    <td><input type="checkbox" name="selected_pupils" value="${pupil.id}"></td>
+                </tr>
+            `).join('');
+
+            // Генерация числовой пагинации
+            paginationLinks.innerHTML = '';
+            for (let i = 1; i <= data.pagination.num_pages; i++) {
+                if (i === data.pagination.current_page) {
+                    paginationLinks.innerHTML += `<span class="current">${i}</span>`;
+                } else {
+                    paginationLinks.innerHTML += `<a href="#" onclick="fetchPupils(${i})">${i}</a>`;
+                }
+            }
+        })
+        .catch(error => console.error("Ошибка загрузки учеников:", error));
+}
+
+// Функция для привязки выбранных учеников
+function linkSelectedPupils() {
+    const selectedPupilIds = Array.from(document.querySelectorAll('input[name="selected_pupils"]:checked'))
+        .map(input => input.value);
+
+    if (selectedPupilIds.length === 0) {
+        alert("Пожалуйста, выберите хотя бы одного ученика для привязки.");
+        return;
+    }
+
+    fetch("evika-school/link-pupils/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ids: selectedPupilIds })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.success);
+        closeLinkModal();
+    })
+    .catch(error => console.error("Ошибка привязки учеников:", error));
+}
+
+
+
+function submitForm() {
+    const form = document.getElementById('editClassForm');
+    const formData = new FormData(form);
+    const errorMessagesDiv = document.getElementById('errorMessages'); // Элемент для отображения ошибок
+
+
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const notification = document.getElementById('notification');
+        notification.style.display = 'block';
+        if (data.success) {
+            notification.className = 'notification success';
+            notification.innerText = 'Класс успешно сохранён!';
+            setTimeout(() => {
+                window.location.href = data.redirect_url;
+            }, 1500);
+        } else {
+            notification.className = 'notification error';
+            notification.innerText = data.errors;
+
+            errorMessagesDiv.innerHTML = data.errors.join('<br>');
+
+
+        }
+    });
+}
+ function confirmDelete() {
+        if (confirm("Вы уверены, что хотите удалить класс?")) {
+            const classId = "{{ class_instance.id }}"; // Предполагается, что этот ID доступен в шаблоне
+            fetch(`/evika-school/delete-class/${classId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                     window.location.href = "/evika-school/classes/";
+                    return response.json();
+                }
+            })
+        }
+    }
+function showNotification(message, type) {
+    const notification = document.getElementById('notification');
+    notification.style.display = 'block';
+    notification.className = `notification ${type}`;
+    notification.innerText = message;
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
+}
+
+function toggleSelectAll(selectAllCheckbox) {
+    const pupilCheckboxes = document.querySelectorAll('.pupil-checkbox');
+    pupilCheckboxes.forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+    });
+    toggleButtonStates();
+}
+
+// Обработчик для кнопки Unlink
+function showUnlinkModal() {
+    const selectedPupils = Array.from(document.querySelectorAll('input.pupil-checkbox:checked'))
+                                .map(checkbox => checkbox.value);
+
+    if (selectedPupils.length > 0) {
+        // Создаем объект FormData для передачи ID учеников
+        const formData = new FormData();
+        selectedPupils.forEach(id => formData.append('ids[]', id));  // Добавляем каждый ID в formData
+
+        // Отправка данных на сервер
+        fetch('/evika-school/unlink-pupils/', {
+            method: 'POST',
+            body: formData  // Используем FormData для передачи данных
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();  // Обработка ответа от сервера
+            } else {
+                throw new Error('Ошибка при отвязывании учеников.');
+            }
+        })
+        .then(data => {
+            location.reload();  // Обновить страницу
+<!--            alert();  // Показать сообщение об успехе-->
+        })
+        .catch(error => console.error('Ошибка запроса:', error));
+    } else {
+        alert('Выберите хотя бы одного ученика.');
+    }
+}
+
+<!--function showUnlinkModal() {-->
+<!-- const selectedPupils =-->
+<!--    Array.from(document.querySelectorAll('input.pupil-checkbox:checked'))-->
+<!--                                 .map(checkbox => checkbox.value);-->
+
+<!--    if (selectedPupils.length > 0) {-->
+<!--        fetch('/evika-school/unlink-pupils/', {-->
+<!--            method: 'POST',-->
+<!--            headers: {-->
+<!--                'Content-Type': 'application/json',-->
+<!--            },-->
+<!--                body: `ids[]=${selectedPupils.join(',')}`-->
+
+<!--        })-->
+<!--        .then(response => {-->
+<!--            if (response.ok) {-->
+<!--                location.reload();-->
+<!--            }-->
+<!--        });-->
+<!--    }-->
+<!--}-->
+
+// Обработчик для кнопки Удалить
+
+function deleteSelectedPupils() {
+    const selectedPupils =
+    Array.from(document.querySelectorAll('input.pupil-checkbox:checked'))
+                                 .map(checkbox => checkbox.value);
+    if (selectedPupils.length > 0) {
+        fetch('/evika-school/delete-pupils/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+                body: `ids[]=${selectedPupils.join(',')}`
+
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            }
+        });
+    }
+}
+
+// Обработчик для кнопки Восстановить
+
+
+
+function restoreSelectedPupils() {
+    const selectedPupils =
+    Array.from(document.querySelectorAll('input.pupil-checkbox:checked'))
+                                 .map(checkbox => checkbox.value);
+    if (selectedPupils.length > 0) {
+        fetch('/evika-school/restore-pupils/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+                body: `ids[]=${selectedPupils.join(',')}`
+
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            }
+        });
+    }
+}
+
+function sendPostRequest(url, selectedPupils) {
+    if (selectedPupils.length > 0) {
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: selectedPupils.map(id => `ids[]=${encodeURIComponent(id)}`).join('&')
+        });
+    }
+    return Promise.reject("No pupils selected");
+}
+
+function toggleButtonStates() {
+    const pupilCheckboxes = document.querySelectorAll('.pupil-checkbox');
+    const anyChecked = Array.from(pupilCheckboxes).some(checkbox => checkbox.checked);
+    document.getElementById('linkButton').disabled = false;
+    document.getElementById('unlinkButton').disabled = !anyChecked;
+    document.getElementById('deleteButton').disabled = !anyChecked;
+    document.getElementById('restoreButton').disabled = !anyChecked;
+}
+
+function filterPupils() {
+    const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('.pupil-table tbody tr');
+
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        const pupilName = Array.from(cells).slice(1).map(cell => cell.textContent.toLowerCase()).join(' ');
+        row.style.display = pupilName.includes(searchQuery) ? '' : 'none';
+    });
+}
+
+function updateRowsPerPage(value) {
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set('rows_per_page', value);
+    window.location.href = currentUrl.toString();
+}
+</script>
+
+</body>
+</html>
