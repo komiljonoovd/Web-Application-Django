@@ -17,18 +17,6 @@ class Classes(models.Model):
     def __str__(self):
         return f'{self.number}-{self.letter}'
 
-    # def clean(self):
-    #
-    #     if self.number < 1 or self.number > 11:
-    #         raise ValidationError({'number': 'Class exists from 1 to 11'})
-    #
-    #     if Classes.objects.filter(number=self.number, letter=self.letter).exists() and not self.pk:
-    #         raise ValidationError(f'"{self.number}-{self.letter}" CLASS ALREADY EXISTS !')
-    #
-    #     if Classes.objects.filter(number=self.number, letter=self.letter).exclude(pk=self.pk).exists():
-    #         raise ValidationError(f' "{self.number}-{self.letter}" CLASS ALREADY EXISTS !')
-    #     return super().clean()
-
     class Meta:
         # unique_together = ['number','letter']
         db_table = 'Classes'

@@ -24,9 +24,9 @@ admin.site.site_title = 'ADMIN PANEL'
 admin.site.index_title = 'EVRIKA SCHOOL'
 
 urlpatterns = [
-    path('login/', auth_views.LoginView.as_view(), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('login/', auth_views.LoginView.as_view(), name='login_view'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout_view'),
     path('', lambda request: redirect('login/', permanent=False)),
-    path('admin/', admin.site.urls),
-    path('evika-school/',include('schoolapp.urls'))
+    path('admin-school/', admin.site.urls),
+    path('evika-school/', include('schoolapp.urls'))
 ]

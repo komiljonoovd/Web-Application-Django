@@ -19,6 +19,22 @@
             border-bottom: 2px solid #4CAF50;
             padding-bottom: 10px;
         }
+
+           table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 8px;
+            text-align: left;
+            cursor: pointer;
+        }
+        th {
+            background: #555;
+        }
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -187,10 +203,34 @@
             padding: 20px;
             border-radius: 5px;
             z-index: 1000;
-            max-width: 80%;
+            max-width: 620px;
+            width:620px;
             max-height: 80%;
             overflow-y: auto;
         }
+
+
+
+        .title_modal {
+            color: #4CAF50;
+            font-size: 28px;
+            padding-bottom: 10px;
+        }
+        .close_button_content{
+            width:100%;
+            display:flex;
+            justify-content:end;
+            align-items:center;
+         }
+
+         .close_button {
+         width:30px;
+         height:30px;
+         display:flex;
+         justify-content:center;
+         align-items:center;
+         }
+
         .modal.open {
             display: block;
         }
@@ -275,8 +315,10 @@
 <!-- Модальное окно для отображения списка неподвязанных учеников -->
 <div id="linkModal" class="modal" style="display: none;">
     <div class="modal-content">
-        <span class="close" onclick="closeLinkModal()">&times;</span>
-        <h2>Неподвязанные ученики</h2>
+       <div class="close_button_content">
+           <button class="close_button" onclick="closeLinkModal()">&times;</button>
+       </div>
+        <div class="title_modal">Неподвязанные ученики</div>
 
         <!-- Кнопка "+ New" и строка поиска -->
         <div class="modal-header">
@@ -285,15 +327,35 @@
         </div>
 
         <!-- Таблица учеников -->
-        <table>
-            <thead>
-                <tr>
-                    <th><center>Full Name<center></th>
-                </tr>
-            </thead>
-            <tbody id="pupilsTableBody">
-            </tbody>
-        </table>
+        <pre>{{pupils}}</pre>
+      <table id="classesTable">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
+                <th>Full name</th>
+
+            </tr>
+        </thead>
+          <tbody>
+          {% if page_obj %}
+          {% for class in pupils %}
+          </tbody>
+          <tbody>
+          <tr>
+              <td style="width:50px"><input type="checkbox" value="{{ class.id }}" name="selectClass"></td>
+              <td> {{ class.first_name}}</td>
+          </tr>
+          {% endfor %}
+          {% else %}
+          <tr>
+              <td></td>
+              <td class="no-data">
+                  <center>NO DATA TO DISPLAY</center>
+              </td>
+          </tr>
+          {% endif %}
+          </tbody>
+    </table>
 
         <!-- Пагинация -->
         <div class="pagination-container">

@@ -12,7 +12,7 @@ class ClassDepartmentAdmin(admin.ModelAdmin):
 
     # list_display_links = ['id', 'number', 'letter', 'teacher', 'createdby', 'modifiedby']
     # search_fields = ['id', 'number', 'letter', ]
-    # list_per_page = 5
+    list_per_page = 30
     ordering = ['id']
 
 
@@ -24,6 +24,8 @@ class GenderAdmin(admin.ModelAdmin):
     # list_display_links = ['id', 'type']
     # search_fields = ['id', 'type']
     ordering = ['id']
+    list_per_page = 30
+
 
 
 @admin.register(Payment)
@@ -32,7 +34,7 @@ class PaymentAdmin(admin.ModelAdmin):
                     'modifiedon', 'createdby', 'modifiedby','isdeleted']
     # list_display_links = ['id', 'cardname']
     # search_fields = ['id', 'cardname']
-    # list_per_page = 5
+    list_per_page = 30
     ordering = ['id']
 
 
@@ -45,6 +47,7 @@ class ParentsAdmin(admin.ModelAdmin):
                     'modifiedby', 'isdeleted', 'note']
     # list_display_links = ['id','first_name']
     # search_fields = ['id', 'cardname']
+    list_per_page = 30
     ordering = ['id']
 
 
@@ -53,7 +56,7 @@ class PupilAdmin(admin.ModelAdmin):
     list_display = ['id', 'first_name', 'last_name', 'surname','classes', 'gender', 'birthday',
                     'createdon',
                     'modifiedon', 'createdby', 'modifiedby', 'isdeleted', 'note']
-
+    list_per_page = 30
     ordering = ['id']
 
 
@@ -63,11 +66,13 @@ class TeacherAdmin(admin.ModelAdmin):
                     'modifiedon', 'createdby', 'modifiedby', 'isdeleted']
 
     ordering = ['id']
+    list_per_page = 30
+
 
 
 @admin.register(ParentPupil)
 class ParentPupilAdmin(admin.ModelAdmin):
     list_display = ['id', 'parent', 'pupil']
-
+    list_per_page = 30
     ordering = ['id']
 
