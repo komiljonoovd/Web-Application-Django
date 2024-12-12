@@ -1,37 +1,23 @@
-from django.template.loader import render_to_string
-from django.utils import timezone
-
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.views import View
-# Create your views here.
-
-
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
-
+from django.core.paginator import Paginator
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render
+from django.utils import timezone
 from schoolapp.models import Classes
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from .models import Classes, Pupils, Teachers, Gender, Payment, Parents
-from django.core.paginator import Paginator
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404
 import json
 from .forms import ClassForm
 
 
 @login_required
-def LoginView(request):
-    return render(request, 'login.html')
-
-
 def all_entities(request):
     return render(request, 'mainpage.html')
 
 
+@login_required
 def class_list(request):
     search_query = request.GET.get('search', '')
     rows_per_page = request.GET.get('rows_per_page', '20')
@@ -70,6 +56,7 @@ def class_list(request):
     return render(request, 'classpage.html', context)
 
 
+@login_required
 @csrf_exempt
 def delete_classes(request):
     if request.method == 'POST':
@@ -85,12 +72,6 @@ def delete_classes(request):
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
-
-
-from django.core.paginator import Paginator
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render
-from django.utils import timezone
 
 
 def edit_class(request, pk):
@@ -162,6 +143,7 @@ def edit_class(request, pk):
     })
 
 
+@login_required
 def add_class(request, pk=None):
     if request.method == 'POST':
         letters_list = ['А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й',
@@ -323,6 +305,7 @@ def list_pupils_not_linked(request):
     return JsonResponse({'pupils': list(pupils)})
 
 
+@login_required
 def pupil_list(request):
     search_query = request.GET.get('search', '')
     rows_per_page = request.GET.get('rows_per_page', '20')
@@ -405,6 +388,7 @@ def delete_parents_list(request):
     return JsonResponse({'message': 'Ошибка при удалении Родителей.'})
 
 
+@login_required
 def parent_list(request):
     search_query = request.GET.get('search', '')
     rows_per_page = request.GET.get('rows_per_page', '20')
@@ -441,6 +425,7 @@ def parent_list(request):
     return render(request, 'parentspage.html', context)
 
 
+@login_required
 def teachers_list(request):
     search_query = request.GET.get('search', '')
     rows_per_page = request.GET.get('rows_per_page', '20')
@@ -495,6 +480,7 @@ def delete_teachers_list(request):
     return JsonResponse({'message': 'Ошибка при удалении Родителей.'})
 
 
+@login_required
 def payment_list(request):
     search_query = request.GET.get('search', '')
     rows_per_page = request.GET.get('rows_per_page', '20')
@@ -542,6 +528,7 @@ def delete_payment_list(request):
     return JsonResponse({'message': 'Ошибка при удалении Тип оплаты.'})
 
 
+@login_required
 def gender_list(request):
     search_query = request.GET.get('search', '')
     rows_per_page = request.GET.get('rows_per_page', '20')

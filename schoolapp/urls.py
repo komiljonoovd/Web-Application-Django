@@ -13,7 +13,7 @@ from .views import (all_entities, class_list,
                     )
 
 urlpatterns = [
-    path('', all_entities, name='class_view'),
+    path('', all_entities, name='main-page'),
 
     path('classes/', class_list, name='class_list'),
     path('edit-class/<int:pk>/', edit_class, name='edit_class'),

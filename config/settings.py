@@ -117,8 +117,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = '/evika-school'
-LOGOUT_REDIRECT_URL = '/login'
+LOGIN_URL = '/evika-school/login/'
 
-# SESSION_COOKIE_AGE = 3600
+SESSION_COOKIE_AGE = 3600
 
