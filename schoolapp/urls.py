@@ -9,11 +9,13 @@ from .views import (all_entities, class_list,
                     teachers_list, delete_teachers_list, restore_teachers_list,
                     payment_list, delete_payment_list, restore_payment_list,
                     gender_list, restore_gender_list, delete_gender_list,
-                    not_linked_pupils, link_pupils
+                    not_linked_pupils, auth_check, link_pupils
                     )
 
 urlpatterns = [
     path('', all_entities, name='main-page'),
+
+    path('evika-school/check-auth/', auth_check, name='auth-check'),
 
     path('classes/', class_list, name='class_list'),
     path('edit-class/<int:pk>/', edit_class, name='edit_class'),

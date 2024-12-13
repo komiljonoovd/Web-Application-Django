@@ -619,3 +619,9 @@ def link_pupils(request):
         pupils = Pupils.objects.filter(id__in=pupil_ids).update(classes=class_id)
         return JsonResponse({'success': 'Привязано успешно.'})
     return JsonResponse({'success': 'Ошибка при привязании.'})
+
+
+def auth_check(request):
+    is_authenticated = request.user.is_authenticated
+    print(is_authenticated)
+    return JsonResponse({'is_authenticated': is_authenticated})
