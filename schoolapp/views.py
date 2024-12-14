@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from schoolapp.models import Classes
@@ -625,3 +625,7 @@ def auth_check(request):
     is_authenticated = request.user.is_authenticated
     print(is_authenticated)
     return JsonResponse({'is_authenticated': is_authenticated})
+
+
+def notFound404(request):
+    return render(request, '404.html', status=404)

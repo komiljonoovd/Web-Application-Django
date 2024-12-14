@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404</title>
+    <title> NOT FOUND 404</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,7 +16,7 @@
         }
         h1 {
             font-size: 48px;
-            color: #343a40;
+            color: black;
         }
         p {
             font-size: 18px;
@@ -33,9 +33,9 @@
 </head>
 <body>
     <div>
-        <h1>Вы не авторизованы !</h1>
+        <h1>NOT FOUND 404</h1>
         <p>Извините, но запрашиваемая страница не найдена.</p>
-        <p>Вы можете вернуться на <a href="/">главную страницу</a>.</p>
+        <p>Вы можете вернуться на <a href="{% url 'main-page' %}">главную страницу</a>.</p>
     </div>
 </body>
 </html>
