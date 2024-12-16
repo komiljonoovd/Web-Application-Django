@@ -301,7 +301,8 @@ def unlink_pupils(request):
 
 
 def list_pupils_not_linked(request):
-    pupils = Pupils.objects.filter(classes__isnull=False, isdeleted=False).values('id', 'first_name', 'last_name')
+    pupils = Pupils.objects.filter(classes__isnull=False, isdeleted=False).values('id', 'first_name', 'last_name',
+                                                                                  'surname')
     return JsonResponse({'pupils': list(pupils)})
 
 
@@ -576,6 +577,7 @@ def delete_gender_list(request):
     return JsonResponse({'message': 'Ошибка при удалении Тип оплаты.'})
 
 
+@login_required
 def not_linked_pupils(request):
     page = int(request.GET.get('page', 1))
     rows_per_page = int(request.GET.get('rows_per_page', 10))
@@ -609,7 +611,7 @@ def not_linked_pupils(request):
         }
     }
 
-    return JsonResponse(data)
+    return JsonResponse({data})
 
 
 def link_pupils(request):
@@ -626,6 +628,5 @@ def auth_check(request):
     print(is_authenticated)
     return JsonResponse({'is_authenticated': is_authenticated})
 
-
-def notFound404(request):
-    return render(request, '404.html', status=404)
+# def notFound404(request):
+#     return render(request, '404.html', status=404)

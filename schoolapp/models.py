@@ -121,6 +121,7 @@ class Pupils(models.Model):
     #     if self.pk and not self.modifiedby:
     #         raise ValidationError({'modifiedby': 'This field is required.'})
 
+
     class Meta:
         db_table = 'Pupils'
         verbose_name = 'Pupils'
