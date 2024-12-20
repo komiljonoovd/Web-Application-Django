@@ -593,6 +593,7 @@ def not_linked_pupils(request):
 
     paginator = Paginator(pupils, rows_per_page)
     paginated_pupils = paginator.get_page(page)
+    print(paginated_pupils)
 
     data = {
         'pupils': [
@@ -601,7 +602,6 @@ def not_linked_pupils(request):
                 'first_name': pupil.first_name,
                 'last_name': pupil.last_name,
                 'surname': pupil.surname,
-                'gender': pupil.gender
             }
             for pupil in paginated_pupils
         ],
@@ -611,7 +611,7 @@ def not_linked_pupils(request):
         }
     }
 
-    return JsonResponse({data})
+    return JsonResponse(data)
 
 
 def link_pupils(request):
@@ -628,5 +628,3 @@ def auth_check(request):
     print(is_authenticated)
     return JsonResponse({'is_authenticated': is_authenticated})
 
-# def notFound404(request):
-#     return render(request, '404.html', status=404)

@@ -1,7 +1,5 @@
 from django.db import models
 
-from django.core.validators import RegexValidator
-
 
 class Classes(models.Model):
     number = models.IntegerField()
@@ -18,7 +16,6 @@ class Classes(models.Model):
         return f'{self.number}-{self.letter}'
 
     class Meta:
-        # unique_together = ['number','letter']
         db_table = 'Classes'
         verbose_name = 'Classes'
         verbose_name_plural = 'Classes'
@@ -70,16 +67,7 @@ class Parents(models.Model):
     first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
     surname = models.CharField(max_length=128, blank=True)
-    phone = models.CharField(
-        max_length=13,
-        validators=[
-            RegexValidator(
-                regex=r'^\+998[0-9]{9}$',
-                message='Phone number needs to look as +998901234567',
-                code='invalid_phone_number'
-            )
-        ]
-    )
+    phone = models.CharField(max_length=20)
     createdon = models.DateTimeField(auto_now_add=True)
     modifiedon = models.DateTimeField(auto_now=True)
     createdby = models.CharField(max_length=128)
@@ -101,10 +89,14 @@ class Parents(models.Model):
 
 
 class Pupils(models.Model):
+    GENDER_CHOICES = [
+        ('Мальчик', 'Мальчик'),
+        ('Девочка', 'Девочка'),
+    ]
     first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
     surname = models.CharField(max_length=128, blank=True, null=True)
-    gender = models.ForeignKey('Gender', on_delete=models.SET_NULL, null=True)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     birthday = models.DateField()
     classes = models.ForeignKey('Classes', on_delete=models.SET_NULL, null=True)
     createdon = models.DateTimeField(auto_now_add=True)
@@ -120,7 +112,6 @@ class Pupils(models.Model):
     # def clean(self):
     #     if self.pk and not self.modifiedby:
     #         raise ValidationError({'modifiedby': 'This field is required.'})
-
 
     class Meta:
         db_table = 'Pupils'
