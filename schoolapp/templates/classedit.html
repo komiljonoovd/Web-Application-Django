@@ -210,7 +210,7 @@
         }
         .title_modal {
             color: #4CAF50;
-            font-size: 28px;
+            font-size: 30px;
             padding-bottom: 10px;
         }
         .close_button_content{
@@ -245,6 +245,26 @@
             right: 10px;
             cursor: pointer;
         }
+        .pagination button.active {
+            background-color: #4CAF50; /* Зеленый цвет для активной кнопки */
+            color: white;
+            font-weight: bold;
+        }
+        .page-btn {
+            padding: 5px 10px;
+            margin: 0 2px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+
+        .page-btn.active {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+            cursor: default;
+        }
+
     </style>
 </head>
 <body>
@@ -287,15 +307,15 @@
     </div>
     <div class="form-group">
         <label>Создано:</label>
-        <input type="text" id="editCreatedBy" value="{{ created_by }}  {{ created_on|date:'H:i - d.m.Y' }}" class="info-field" disabled>
+        <input type="text" id="editCreatedBy" value="{{ created_by }}  {{ created_on|date:'H:i  d.m.Y' }}" class="info-field" disabled>
     </div>
     <div class="form-group">
         <label>Изменено:</label>
-        <input type="text" id="editModifiedBy" value="{{ modified_by }}  {{ modified_on|date:'H:i - d.m.Y' }}" class="info-field" disabled>
+        <input type="text" id="editModifiedBy" value="{{ modified_by }}  {{ modified_on|date:'H:i  d.m.Y' }}" class="info-field" disabled>
     </div>
 </form>
 
-<center><h3>Список учеников</h3></center>
+<center><h3>Учащиеся текущего класса</h3></center>
 <div class="action-buttons">
     <button type="button" class="save" onclick="window.location.href='/evika-school/add-pupil/'">+ New</button>
     <button type="button" class="link" id="linkButton" onclick="showLinkModal()">Link</button>
@@ -309,70 +329,214 @@
     </div>
 </div>
 
-<!-- Модальное окно для отображения списка неподвязанных учеников -->
 <div id="linkModal" class="modal" style="display: none;">
     <div class="modal-content">
-       <div class="close_button_content">
-           <button class="close_button" onclick="closeLinkModal()">&times;</button>
-       </div>
-        <div class="title_modal"><center> СПИСОК </center></div>
+        <!-- Кнопка закрытия -->
+        <div class="close_button_content">
+            <button class="close_button" onclick="closeLinkModal()">&times;</button>
+        </div>
+
+        <!-- Заголовок модального окна -->
+        <div class="title_modal">
+            <center>Список учащихся</center>
+        </div>
 
         <!-- Кнопка "+ New" и строка поиска -->
         <div class="modal-header">
             <button type="button" class="new-button" onclick="createNewPupil()">+ New</button>
-            <input type="text" id="searchInput" placeholder="Поиск учеников и учениц..." oninput="fetchPupils()">
+            <input type="text" id="searchInput" placeholder="Поиск..." oninput="fetchPupils()">
         </div>
 
-        <!-- Таблица учеников -->
-        <pre>{{fullName}}</pre>
-      <table id="classesTable">
-        <thead>
-            <tr>
-                <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
-                <th><center>Full Name</center></th>
+        <!-- Таблица учащихся -->
+        <table id="pupilTable" class="pupil-table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
+                    <th><center>Full Name</center></th>
+                </tr>
+            </thead>
+            <tbody id="pupilTableBody">
+                <!-- Данные будут загружаться динамически через fetchPupils() -->
+            </tbody>
+        </table>
 
-            </tr>
-        </thead>
-          <tbody>
-          {% if page_obj %}
-          {% for class in pupils %}
-          </tbody>
-          <tbody>
-          <tr>
-              <td style="width:50px"><input type="checkbox" value="{{ class.id }}" name="selectClass"></td>
-              <td> </td>
-          </tr>
-          {% endfor %}
-          {% else %}
-          <tr>
-              <td></td>
-              <td class="no-data">
-                  <center>NO DATA TO DISPLAY</center>
-              </td>
-          </tr>
-          {% endif %}
-          </tbody>
-    </table>
-
-        <!-- Пагинация -->
+        <!-- Контейнер для пагинации -->
         <div class="pagination-container">
-            <div class="pagination" id="paginationLinks">
-                <!-- Числовая пагинация будет загружена через JavaScript -->
+            <div id="paginationLinks" class="pagination">
+                <!-- Кнопки пагинации загружаются динамически -->
             </div>
             <div class="rows-per-page">
                 <label for="rowsPerPage">Page size:</label>
                 <select id="rowsPerPage" onchange="fetchPupils()">
-                    <option value="5">5</option>
                     <option value="10" selected>10</option>
-                    <option value="20">20</option>
+                    <option value="15">15</option>
                 </select>
             </div>
         </div>
-
-        <!-- Кнопка для привязки выбранных учеников -->
-        <button type="button" onclick="linkSelectedPupils()">Привязать</button>
     </div>
 </div>
+
+
+<!--&lt;!&ndash; Модальное окно &ndash;&gt;-->
+<!--<div id="linkModal" class="modal" style="display: none;">-->
+<!--    <div class="modal-content">-->
+<!--        <div class="close_button_content">-->
+<!--            <button class="close_button" onclick="closeLinkModal()">&times;</button>-->
+<!--        </div>-->
+<!--        <div class="title_modal">-->
+<!--            <center>Список учащихся</center>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Кнопка "+ New" и строка поиска &ndash;&gt;-->
+<!--        <div class="modal-header">-->
+<!--            <button type="button" class="new-button" onclick="createNewPupil()">+ New</button>-->
+<!--            <input type="text" id="searchInput" placeholder="Поиск..." oninput="fetchPupils()">-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Таблица учеников &ndash;&gt;-->
+<!--        <table id="pupilTable" class="pupil-table">-->
+<!--            <thead>-->
+<!--                <tr>-->
+<!--                    <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>-->
+<!--                    <th><center>Full Name</center></th>-->
+<!--                </tr>-->
+<!--            </thead>-->
+<!--            <tbody id="pupilTableBody">-->
+<!--                &lt;!&ndash; Данные будут загружены динамически &ndash;&gt;-->
+<!--            </tbody>-->
+<!--        </table>-->
+
+<!--        &lt;!&ndash; Пагинация &ndash;&gt;-->
+<!--        <div class="pagination-container">-->
+<!--            <div class="pagination" id="paginationLinks">-->
+<!--                &lt;!&ndash; Числовая пагинация будет загружена через JavaScript &ndash;&gt;-->
+<!--            </div>-->
+<!--            <div class="rows-per-page">-->
+<!--                <label for="rowsPerPage">Page size:</label>-->
+<!--                <select id="rowsPerPage" onchange="fetchPupils()">-->
+<!--                    <option value="5" selected>5</option>-->
+<!--                    <option value="10">10</option>-->
+<!--                </select>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Кнопка для привязки выбранных учеников &ndash;&gt;-->
+<!--        <button type="button" onclick="linkSelectedPupils()">Привязать</button>-->
+<!--    </div>-->
+<!--</div>-->
+
+
+<!--&lt;!&ndash;  M O D A L WINDOW &ndash;&gt;-->
+<!--<div id="linkModal" class="modal" style="display: none;">-->
+<!--    <div class="modal-content">-->
+<!--        <div class="close_button_content">-->
+<!--            <button class="close_button" onclick="closeLinkModal()">&times;</button>-->
+<!--        </div>-->
+<!--        <div class="title_modal">-->
+<!--            <center>Список учащихся</center>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Кнопка "+ New" и строка поиска &ndash;&gt;-->
+<!--        <div class="modal-header">-->
+<!--            <button type="button" class="new-button" onclick="createNewPupil()">+ New</button>-->
+<!--            <input type="text" id="searchInput" placeholder="Поиск..." oninput="fetchPupils()">-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Таблица учеников &ndash;&gt;-->
+<!--        <table id="pupilTable" class="pupil-table">-->
+<!--            <thead>-->
+<!--                <tr>-->
+<!--                    <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>-->
+<!--                    <th><center>Full Name</center></th>-->
+<!--                </tr>-->
+<!--            </thead>-->
+<!--            <tbody id="pupilTableBody">-->
+<!--                &lt;!&ndash; Данные будут загружены динамически &ndash;&gt;-->
+<!--            </tbody>-->
+<!--        </table>-->
+
+<!--        &lt;!&ndash; Пагинация &ndash;&gt;-->
+<!--        <div class="pagination-container">-->
+<!--            <div class="pagination" id="paginationLinks">-->
+<!--                &lt;!&ndash; Числовая пагинация будет загружена через JavaScript &ndash;&gt;-->
+<!--            </div>-->
+<!--            <div class="rows-per-page">-->
+<!--                <label for="rowsPerPage">Page size:</label>-->
+<!--                <select id="rowsPerPage" onchange="fetchPupils()">-->
+<!--                    <option value="5" selected>5</option>-->
+<!--                    <option value="10">10</option>-->
+<!--                </select>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Кнопка для привязки выбранных учеников &ndash;&gt;-->
+<!--        <button type="button" onclick="linkSelectedPupils()">Привязать</button>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--&lt;!&ndash; Модальное окно для отображения списка неподвязанных учеников &ndash;&gt;-->
+<!--<div id="linkModal" class="modal" style="display: none;">-->
+<!--    <div class="modal-content">-->
+<!--       <div class="close_button_content">-->
+<!--           <button class="close_button" onclick="closeLinkModal()">&times;</button>-->
+<!--       </div>-->
+<!--        <div class="title_modal"><center> Список учащихся </center></div>-->
+
+<!--        &lt;!&ndash; Кнопка "+ New" и строка поиска &ndash;&gt;-->
+<!--        <div class="modal-header">-->
+<!--            <button type="button" class="new-button" onclick="createNewPupil()">+ New</button>-->
+<!--            <input type="text" id="searchInput" placeholder="Поиск..." oninput="fetchPupils()">-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Таблица учеников &ndash;&gt;-->
+<!--&lt;!&ndash;        <pre>{{fullName}}</pre>&ndash;&gt;-->
+<!--      <table id="classesTable">-->
+<!--        <thead>-->
+<!--            <tr>-->
+<!--                <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>-->
+<!--                <th><center>Full Name</center></th>-->
+
+<!--            </tr>-->
+<!--        </thead>-->
+<!--          <tbody>-->
+<!--          {% if page_obj %}-->
+<!--          {% for class in pupils %}-->
+<!--          </tbody>-->
+<!--          <tbody>-->
+<!--          <tr>-->
+<!--              <td style="width:50px"><input type="checkbox" value="{{ class.id }}" name="selectClass"></td>-->
+<!--              <td> </td>-->
+<!--          </tr>-->
+<!--          {% endfor %}-->
+<!--          {% else %}-->
+<!--          <tr>-->
+<!--              <td></td>-->
+<!--              <td class="no-data">-->
+<!--                  <center>NO DATA TO DISPLAY</center>-->
+<!--              </td>-->
+<!--          </tr>-->
+<!--          {% endif %}-->
+<!--          </tbody>-->
+<!--    </table>-->
+
+<!--        &lt;!&ndash; Пагинация &ndash;&gt;-->
+<!--        <div class="pagination-container">-->
+<!--            <div class="pagination" id="paginationLinks">-->
+<!--                &lt;!&ndash; Числовая пагинация будет загружена через JavaScript &ndash;&gt;-->
+<!--            </div>-->
+<!--            <div class="rows-per-page">-->
+<!--                <label for="rowsPerPage">Page size:</label>-->
+<!--                <select id="rowsPerPage" onchange="fetchPupils()">-->
+<!--                    <option value="5" selected >5</option>-->
+<!--                    <option value="10">10</option>-->
+<!--                </select>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Кнопка для привязки выбранных учеников &ndash;&gt;-->
+<!--        <button type="button" onclick="linkSelectedPupils()">Привязать</button>-->
+<!--    </div>-->
+<!--</div>-->
 
 
 <table class="pupil-table">
@@ -719,36 +883,171 @@ function filterPupils() {
         row.style.display = pupilName.includes(searchQuery) ? '' : 'none';
     });
 }
+
+
+function fetchPupils(page = 1) {
+    const searchQuery = document.getElementById('searchInput').value;
+    const rowsPerPage = document.getElementById('rowsPerPage').value;
+
+    fetch(`/not_linked_pupils/?page=${page}&rows_per_page=${rowsPerPage}&search=${searchQuery}`)
+        .then((response) => response.json())
+        .then((data) => {
+            const pupilTableBody = document.getElementById('pupilTableBody');
+            pupilTableBody.innerHTML = '';
+
+            if (data.pupils.length > 0) {
+                data.pupils.forEach((pupil) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><input type="checkbox" value="${pupil.id}" name="selectPupil"></td>
+                        <td>${pupil.last_name} ${pupil.first_name} ${pupil.surname || ''}</td>
+                    `;
+                    pupilTableBody.appendChild(row);
+                });
+            } else {
+                pupilTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="2" class="no-data">
+                            <center>NO DATA TO DISPLAY</center>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            updatePagination(data.pagination);
+        })
+        .catch((error) => {
+            console.error('Ошибка при загрузке данных:', error);
+        });
+}
+
+
+
+
 // Функция загрузки учеников через AJAX
+<!--function fetchPupils() {-->
+<!--    const searchQuery = document.getElementById('searchInput').value;-->
+<!--    const rowsPerPage = document.getElementById('rowsPerPage').value;-->
+<!--    const page = document.getElementById('currentPage')?.value || 1;-->
+
+<!--    fetch(`/evika-school/not-linked-pupils/?search=${searchQuery}&rows_per_page=${rowsPerPage}&page=${page}`)-->
+<!--        .then(response => response.json())-->
+<!--        .then(data => {-->
+<!--            // Обновляем таблицу-->
+<!--            const tbody = document.getElementById('pupilsTableBody');-->
+<!--            tbody.innerHTML = '';  // Очищаем текущие данные в таблице-->
+
+<!--            if (data.pupils.length > 0) {-->
+<!--                data.pupils.forEach(pupil => {-->
+<!--                    // Объединяем first_name, last_name и surname в одну строку-->
+<!--                    const fullName = `${pupil.first_name} ${pupil.last_name} ${pupil.surname||""}`;-->
+
+<!--                    // Добавляем новую строку с полным именем-->
+<!--                    tbody.innerHTML += `-->
+<!--                        <tr>-->
+<!--                            <td><input type="checkbox" value="${pupil.id}" name="selectPupil"></td>-->
+<!--                            <td>${fullName}</td>-->
+<!--                        </tr>`;-->
+<!--                });-->
+<!--            } else {-->
+<!--                tbody.innerHTML = `-->
+<!--                    <tr>-->
+<!--                        <td colspan="2" class="no-data">-->
+<!--                            <center>NO DATA TO DISPLAY</center>-->
+<!--                        </td>-->
+<!--                    </tr>`;-->
+<!--            }-->
+
+<!--            // Обновляем пагинацию-->
+<!--            const paginationLinks = document.getElementById('paginationLinks');-->
+<!--            paginationLinks.innerHTML = '';  // Очищаем текущие ссылки пагинации-->
+
+<!--            for (let i = 1; i <= data.pagination.num_pages; i++) {-->
+<!--                paginationLinks.innerHTML += `-->
+<!--                    <button-->
+<!--                        class="${i === data.pagination.current_page ? 'active' : ''}"-->
+<!--                        onclick="changePage(${i})">-->
+<!--                        ${i}-->
+<!--                    </button>`;-->
+<!--            }-->
+<!--        })-->
+<!--        .catch(error => console.error('Ошибка загрузки данных:', error));-->
+<!--}-->
+
+<!--function fetchPupils() {-->
+<!--    const searchQuery = document.getElementById('searchInput').value;-->
+<!--    const rowsPerPage = document.getElementById('rowsPerPage').value;-->
+<!--    const page = document.getElementById('currentPage')?.value || 1;-->
+
+<!--    fetch(`/evika-school/not-linked-pupils/?search=${searchQuery}&rows_per_page=${rowsPerPage}&page=${page}`)-->
+<!--        .then(response => response.json())-->
+<!--        .then(data => {-->
+<!--            console.log('Fetched data from server:', data);-->
+
+<!--            // Обновляем таблицу-->
+<!--            const tbody = document.getElementById('pupilsTableBody');-->
+<!--            tbody.innerHTML = ''; // Очищаем текущие данные в таблице-->
+
+<!--            if (data.pupils.length > 0) {-->
+<!--                data.pupils.forEach(pupil => {-->
+<!--                    const fullName = `${pupil.first_name} ${pupil.last_name} ${pupil.surname || ""}`;-->
+<!--                    const row = document.createElement('tr');-->
+<!--                    row.innerHTML = `-->
+<!--                        <td><input type="checkbox" value="${pupil.id}" name="selectPupil"></td>-->
+<!--                        <td>${fullName}</td>`;-->
+<!--                    tbody.appendChild(row);-->
+<!--                });-->
+<!--            } else {-->
+<!--                tbody.innerHTML = `-->
+<!--                    <tr>-->
+<!--                        <td colspan="2" class="no-data">-->
+<!--                            <center>NO DATA TO DISPLAY</center>-->
+<!--                        </td>-->
+<!--                    </tr>`;-->
+<!--            }-->
+
+<!--            // Обновляем пагинацию-->
+<!--            updatePagination(data.pagination); // Вызов функции обновления пагинации-->
+<!--        })-->
+<!--        .catch(error => console.error('Ошибка загрузки данных:', error));-->
+<!--}-->
+
+
 function fetchPupils() {
     const searchQuery = document.getElementById('searchInput').value;
     const rowsPerPage = document.getElementById('rowsPerPage').value;
     const page = document.getElementById('currentPage')?.value || 1;
 
-    fetch(`/not-linked-pupils/?search=${searchQuery}&rows_per_page=${rowsPerPage}&page=${page}`)
-        .then(response => response.json())
+    fetch(`/evika-school/not-linked-pupils/?search=${searchQuery}&rows_per_page=${rowsPerPage}&page=${page}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Ошибка HTTP: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            // Логирование данных для проверки
+            console.log('Fetched data from server:', data);
+
             // Обновляем таблицу
-            const tbody = document.getElementById('pupilsTableBody');
+            const tbody = document.getElementById('pupilTableBody');
             tbody.innerHTML = '';  // Очищаем текущие данные в таблице
 
-            if (data.pupils.length > 0) {
+            if (data.pupils && data.pupils.length > 0) {
                 data.pupils.forEach(pupil => {
-                    // Объединяем first_name, last_name и surname в одну строку
-                    const fullName = `${pupil.first_name} ${pupil.last_name} ${pupil.surname||""}`;
-
-                    // Добавляем новую строку с полным именем
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><input type="checkbox" value="${pupil.id}" name="selectPupil"></td>
-                            <td>${fullName}</td>
-                        </tr>`;
+                    const fullName = `${pupil.first_name} ${pupil.last_name} ${pupil.surname || ""}`;
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><input type="checkbox" value="${pupil.id}" name="selectPupil"></td>
+                        <td>${fullName}</td>
+                    `;
+                    tbody.appendChild(row);  // Добавляем строку в таблицу
                 });
             } else {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="2" class="no-data">
-                            <center>Нет данных для отображения</center>
+                            <center>NO DATA TO DISPLAY</center>
                         </td>
                     </tr>`;
             }
@@ -758,27 +1057,243 @@ function fetchPupils() {
             paginationLinks.innerHTML = '';  // Очищаем текущие ссылки пагинации
 
             for (let i = 1; i <= data.pagination.num_pages; i++) {
-                paginationLinks.innerHTML += `
-                    <button
-                        class="${i === data.pagination.current_page ? 'active' : ''}"
-                        onclick="changePage(${i})">
-                        ${i}
-                    </button>`;
+                const pageButton = document.createElement('button');
+                pageButton.classList.add(i === data.pagination.current_page ? 'active' : '');  // Класс активной страницы
+                pageButton.innerText = i;
+                pageButton.onclick = () => changePage(i);  // Обработчик смены страницы
+                paginationLinks.appendChild(pageButton);
             }
+
+            // Вывод для отладки
+            console.log(`Current page: ${data.pagination.current_page}`);
+            console.log(`Number of pages: ${data.pagination.num_pages}`);
         })
         .catch(error => console.error('Ошибка загрузки данных:', error));
 }
 
-// Функция для изменения страницы
-function changePage(page) {
-    document.getElementById('currentPage').value = page;
+
+
+
+<!--function fetchPupils() {-->
+<!--    const searchQuery = document.getElementById('searchInput').value;-->
+<!--    const rowsPerPage = document.getElementById('rowsPerPage').value;-->
+<!--    const page = document.getElementById('currentPage')?.value || 1;-->
+
+<!--    fetch(`/evika-school/not-linked-pupils/?search=${searchQuery}&rows_per_page=${rowsPerPage}&page=${page}`)-->
+<!--        .then(response => response.json())-->
+<!--        .then(data => {-->
+<!--            console.log('Fetched data:',data)-->
+<!--            // Обновляем таблицу-->
+<!--            const tbody = document.getElementById('pupilsTableBody');-->
+<!--&lt;!&ndash;            tbody.innerHTML = '';  // Очищаем текущие данные в таблице&ndash;&gt;-->
+
+<!--            if (data.pupils.length > 0) {-->
+<!--                data.pupils.forEach(pupil => {-->
+<!--                    // Объединяем first_name, last_name и surname в одну строку-->
+<!--                    const fullName = `${pupil.first_name} ${pupil.last_name} ${pupil.surname || ""}`;-->
+
+<!--                    // Создаем новую строку для таблицы-->
+<!--                    const row = document.createElement('tr');-->
+<!--                    row.innerHTML = `-->
+<!--                        <td><input type="checkbox" value="${pupil.id}" name="selectPupil"></td>-->
+<!--                        <td>${fullName}</td>-->
+<!--                    `;-->
+<!--                    tbody.appendChild(row);  // Добавляем строку в таблицу-->
+<!--                });-->
+<!--            } else {-->
+<!--                tbody.innerHTML = `-->
+<!--                    <tr>-->
+<!--                        <td colspan="2" class="no-data">-->
+<!--                            <center>NO DATA TO DISPLAY</center>-->
+<!--                        </td>-->
+<!--                    </tr>`;-->
+<!--            }-->
+
+<!--            // Обновляем пагинацию-->
+<!--            const paginationLinks = document.getElementById('paginationLinks');-->
+<!--            paginationLinks.innerHTML = '';  // Очищаем текущие ссылки пагинации-->
+
+<!--            for (let i = 1; i <= data.pagination.num_pages; i++) {-->
+<!--                const pageButton = document.createElement('button');-->
+<!--                pageButton.classList.add(i === data.pagination.current_page ? 'active' : '');  // Класс активной страницы-->
+<!--                pageButton.innerText = i;-->
+<!--                pageButton.onclick = () => changePage(i);  // Обработчик смены страницы-->
+<!--                paginationLinks.appendChild(pageButton);-->
+<!--            }-->
+<!--        })-->
+<!--        .catch(error => console.error('Ошибка загрузки данных:', error));-->
+<!--}-->
+
+// Функция для смены страницы
+<!--function changePage(page) {-->
+<!--    const currentPageInput = document.getElementById('currentPage');-->
+<!--    currentPageInput.value = page;  // Обновляем текущую страницу в скрытом поле-->
+<!--    fetchPupils();  // Загружаем данные для новой страницы-->
+<!--}-->
+
+function showLinkModal() {
+    document.getElementById('linkModal').style.display = 'block';
     fetchPupils();
 }
+
+// Закрытие модального окна
+function closeLinkModal() {
+    document.getElementById('linkModal').style.display = 'none';
+}
+
+<!--function updatePagination(pagination) {-->
+<!--    const paginationLinks = document.getElementById('paginationLinks');-->
+<!--    paginationLinks.innerHTML = ''; // Очищаем текущие ссылки пагинации-->
+
+<!--    for (let i = 1; i <= pagination.num_pages; i++) {-->
+<!--        const pageButton = document.createElement('button');-->
+<!--        pageButton.textContent = i; // Номер страницы на кнопке-->
+
+<!--        // Добавляем класс активной страницы, если это текущая-->
+<!--        if (i === pagination.current_page) {-->
+<!--            pageButton.classList.add('active');-->
+<!--        }-->
+
+<!--        // Обработчик клика для смены страницы-->
+<!--        pageButton.onclick = () => changePage(i);-->
+
+<!--        paginationLinks.appendChild(pageButton); // Добавляем кнопку в контейнер-->
+<!--    }-->
+<!--}-->
+
+<!--function updatePagination(pagination) {-->
+<!--    const paginationLinks = document.getElementById('paginationLinks');-->
+<!--    paginationLinks.innerHTML = '';-->
+
+<!--    for (let i = 1; i <= pagination.num_pages; i++) {-->
+<!--        const pageLink = document.createElement('a');-->
+<!--        pageLink.href = '#';-->
+<!--        pageLink.textContent = i;-->
+<!--        if (i === pagination.current_page) {-->
+<!--            pageLink.classList.add('current');-->
+<!--        }-->
+<!--        pageLink.onclick = (e) => {-->
+<!--            e.preventDefault();-->
+<!--            fetchPupils(i);-->
+<!--        };-->
+<!--        paginationLinks.appendChild(pageLink);-->
+<!--    }-->
+<!--}-->
+
+
+const paginationLinks = document.getElementById('paginationLinks');
+paginationLinks.innerHTML = '';  // Очищаем текущие ссылки пагинации
+
+// Создаем кнопки для пагинации
+for (let i = 1; i <= data.pagination.num_pages; i++) {
+    const pageButton = document.createElement('button');
+    pageButton.classList.add(i === data.pagination.current_page ? 'active' : '');  // Класс активной страницы
+    pageButton.innerText = i;
+    pageButton.onclick = () => changePage(i);  // Обработчик смены страницы
+    paginationLinks.appendChild(pageButton);
+}
+
+
+
+// Функция для изменения страницы
+<!--function changePage(page) {-->
+<!--    document.getElementById('currentPage').value = page;-->
+<!--    fetchPupils();-->
+<!--}-->
 function updateRowsPerPage(value) {
     const currentUrl = new URL(window.location.href);
     currentUrl.searchParams.set('rows_per_page', value);
     window.location.href = currentUrl.toString();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+function fetchPupils() {
+    const searchQuery = document.getElementById('searchInput').value.trim(); // Убираем лишние пробелы
+    const rowsPerPage = document.getElementById('rowsPerPage').value || 5; // Устанавливаем значение по умолчанию
+    const page = document.getElementById('currentPage')?.value || 1;
+
+    fetch(`/evika-school/not-linked-pupils/?search=${encodeURIComponent(searchQuery)}&rows_per_page=${rowsPerPage}&page=${page}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Ошибка HTTP: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Логирование данных для проверки
+            console.log('Fetched data from server:', data);
+
+            // Обновляем таблицу
+            const tbody = document.getElementById('pupilTableBody');
+            tbody.innerHTML = ''; // Очищаем текущие данные в таблице
+
+            if (data.pupils && data.pupils.length > 0) {
+                data.pupils.forEach(pupil => {
+                    const fullName = `${pupil.first_name} ${pupil.last_name} ${pupil.surname || ""}`;
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><input type="checkbox" value="${pupil.id}" name="selectPupil"></td>
+                        <td>${fullName}</td>
+                    `;
+                    tbody.appendChild(row); // Добавляем строку в таблицу
+                });
+            } else {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="2" class="no-data">
+                            <center>NO DATA TO DISPLAY</center>
+                        </td>
+                    </tr>`;
+            }
+
+            // Обновляем пагинацию
+            updatePagination(data.pagination);
+
+            // Вывод для отладки
+            console.log(`Current page: ${data.pagination.current_page}`);
+            console.log(`Number of pages: ${data.pagination.num_pages}`);
+        })
+        .catch(error => console.error('Ошибка загрузки данных:', error));
+}
+
+function updatePagination(pagination) {
+    const paginationLinks = document.getElementById('paginationLinks');
+    paginationLinks.innerHTML = ''; // Очищаем текущие ссылки пагинации
+
+    if (pagination.num_pages > 0) {
+        for (let i = 1; i <= pagination.num_pages; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.textContent = i;
+            if (i === pagination.current_page) {
+                pageButton.classList.add('active'); // Класс для текущей страницы
+            }
+            pageButton.onclick = () => changePage(i); // Обработчик смены страницы
+            paginationLinks.appendChild(pageButton); // Добавляем кнопку в контейнер
+        }
+    } else {
+        paginationLinks.innerHTML = '<span>No pages available</span>';
+    }
+}
+
+function changePage(page) {
+    document.getElementById('currentPage').value = page;
+    fetchPupils(); // Перезагружаем данные для выбранной страницы
+}
+
+
+
+
 </script>
 
 </body>

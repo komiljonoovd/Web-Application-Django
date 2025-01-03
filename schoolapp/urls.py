@@ -1,16 +1,16 @@
 from django.urls import path, include
-from .views import (all_entities, class_list,
-                    edit_class, add_class,
-                    delete_classes, restore_classes,
-                    raise_number, archive_classes, delete_class,
-                    restore_pupils, delete_pupils, unlink_pupils,
-                    pupil_list, delete_pupils_list, restore_pupils_list,
-                    parent_list, delete_parents_list, restore_parents_list,
-                    teachers_list, delete_teachers_list, restore_teachers_list,
-                    payment_list, delete_payment_list, restore_payment_list,
-                    gender_list, restore_gender_list, delete_gender_list,
-                    not_linked_pupils, link_pupils
-                    )
+from schoolapp.views import (all_entities, class_list,
+                             edit_class, add_class,
+                             delete_classes, restore_classes,
+                             raise_number, archive_classes, delete_class,
+                             restore_pupils, delete_pupils, unlink_pupils,
+                             pupil_list, delete_pupils_list, restore_pupils_list,
+                             parent_list, delete_parents_list, restore_parents_list,
+                             teachers_list, delete_teachers_list, restore_teachers_list,
+                             payment_list, delete_payment_list, restore_payment_list,
+                             gender_list, restore_gender_list, delete_gender_list,
+                             not_linked_pupils, link_pupils
+                             )
 
 urlpatterns = [
     path('', all_entities, name='main-page'),

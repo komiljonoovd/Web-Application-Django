@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'schoolapp',
+    'django_extensions',
+
 ]
 
 MIDDLEWARE = [
@@ -122,3 +124,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/evika-school/login/'
 LOGOUT_URL = '/evika-school/logout/'
 SESSION_COOKIE_AGE = 3600
+APPEND_SLASH = True

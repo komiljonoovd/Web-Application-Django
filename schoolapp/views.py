@@ -56,7 +56,7 @@ def class_list(request):
     return render(request, 'classpage.html', context)
 
 
-@login_required
+# @login_required
 @csrf_exempt
 def delete_classes(request):
     if request.method == 'POST':
@@ -74,6 +74,7 @@ def delete_classes(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
 
 
+@login_required
 def edit_class(request, pk):
     class_instance = get_object_or_404(Classes, id=pk)
 
@@ -300,10 +301,11 @@ def unlink_pupils(request):
     return JsonResponse({'error': 'Ошибка при архивировании классов.'}, status=400)
 
 
-def list_pupils_not_linked(request):
-    pupils = Pupils.objects.filter(classes__isnull=False, isdeleted=False).values('id', 'first_name', 'last_name',
-                                                                                  'surname')
-    return JsonResponse({'pupils': list(pupils)})
+#
+# def list_pupils_not_linked(request):
+#     pupils = Pupils.objects.filter(classes__isnull=False, isdeleted=False).values('id', 'first_name', 'last_name',
+#                                                                                   'surname')
+#     return JsonResponse({'pupils': list(pupils)})
 
 
 @login_required
@@ -329,7 +331,7 @@ def pupil_list(request):
         ) | pupils.filter(
             surname__icontains=search_query.capitalize()
         ) | pupils.filter(
-            gender__type__icontains=search_query.capitalize()
+            gender__icontains=search_query.capitalize()
         ) | pupils.filter(
             birthday__icontains=search_query
         ) | pupils.filter(
@@ -577,23 +579,27 @@ def delete_gender_list(request):
     return JsonResponse({'message': 'Ошибка при удалении Тип оплаты.'})
 
 
-@login_required
+@csrf_exempt
 def not_linked_pupils(request):
     page = int(request.GET.get('page', 1))
     rows_per_page = int(request.GET.get('rows_per_page', 10))
     search_query = request.GET.get('search', '').strip()
 
-    pupils = Pupils.objects.filter(classes__isnull=True, isdeleted=False)
+    pupil = Pupils.objects.filter(classes=None, isdeleted=False).order_by('last_name')
 
     if search_query:
-        pupils = pupils.filter(first_name__icontains=search_query.capitalize()
-                                                     | pupils.filter(last_name__icontains=search_query.capitalize())
-                                                     | pupils.filter(surname__icontains=search_query.capitalize())
-                               )
+        pupil = pupil.filter(first_name__icontains=search_query.capitalize()
+                                                   | pupil.filter(last_name__icontains=search_query.capitalize())
+                                                   | pupil.filter(surname__icontains=search_query.capitalize())
+                             )
 
-    paginator = Paginator(pupils, rows_per_page)
+    paginator = Paginator(pupil, rows_per_page)
     paginated_pupils = paginator.get_page(page)
-    print(paginated_pupils)
+    # print(paginated_pupils)
+    # print(pupil)
+    # for i in pupil:
+    #     print(i.first_name,end=' ')
+    #     print(i.last_name)
 
     data = {
         'pupils': [
@@ -618,7 +624,7 @@ def link_pupils(request):
     if request.method == 'POST':
         pupil_ids = request.POST.getlist('ids[]')
         class_id = request.session.get('class_id')
-        pupils = Pupils.objects.filter(id__in=pupil_ids).update(classes=class_id)
+        Pupils.objects.filter(id__in=pupil_ids).update(classes=class_id)
         return JsonResponse({'success': 'Привязано успешно.'})
     return JsonResponse({'success': 'Ошибка при привязании.'})
 
@@ -627,4 +633,3 @@ def auth_check(request):
     is_authenticated = request.user.is_authenticated
     print(is_authenticated)
     return JsonResponse({'is_authenticated': is_authenticated})
-
