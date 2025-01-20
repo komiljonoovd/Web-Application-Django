@@ -30,10 +30,10 @@ def class_list(request):
     except ValueError:
         rows_per_page = 20
 
-    classes = Classes.objects.all().order_by('-number', 'letter')
+    classes = Classes.objects.all().order_by('-isactive','-number','letter')
     if search_query:
         classes = classes.filter(
-            number__icontains=search_query.capitalize()
+            number__iexact=search_query.capitalize()
         ) | classes.filter(
             letter__icontains=search_query.capitalize()
         ) | classes.filter(
@@ -88,7 +88,7 @@ def edit_class(request, pk):
 
             if int(number) < 1 or int(number) > 11:
                 error_messages.append('Классы существуют с 1-го до 11-го класса!')
-            if Classes.objects.filter(number=number, letter=letter).exclude(pk=pk).exists():
+            if Classes.objects.filter(number=number, letter=letter,isactive=True).exclude(pk=pk).exists():
                 error_messages.append(f'Класс "{number}-{letter}" уже существует!')
             if letter not in ['А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й',
                               'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У',
@@ -157,7 +157,7 @@ def add_class(request, pk=None):
 
             error_messages = []
 
-            if Classes.objects.filter(number=number, letter=letter).exclude(pk=pk).exists():
+            if Classes.objects.filter(number=number, letter=letter,isactive=True).exclude(pk=pk).exists():
                 error_messages.append(f'Класс "{number}-{letter}" уже существует! ')
 
             # Проверка на допустимый диапазон классов
@@ -588,18 +588,13 @@ def not_linked_pupils(request):
     pupil = Pupils.objects.filter(classes=None, isdeleted=False).order_by('last_name')
 
     if search_query:
-        pupil = pupil.filter(first_name__icontains=search_query.capitalize()
-                                                   | pupil.filter(last_name__icontains=search_query.capitalize())
-                                                   | pupil.filter(surname__icontains=search_query.capitalize())
+        pupil = pupil.filter(first_name__iexact=search_query.capitalize()
+                                                | pupil.filter(last_name__icontains=search_query.capitalize())
+                                                | pupil.filter(surname__icontains=search_query.capitalize())
                              )
 
     paginator = Paginator(pupil, rows_per_page)
     paginated_pupils = paginator.get_page(page)
-    # print(paginated_pupils)
-    # print(pupil)
-    # for i in pupil:
-    #     print(i.first_name,end=' ')
-    #     print(i.last_name)
 
     data = {
         'pupils': [
@@ -620,11 +615,15 @@ def not_linked_pupils(request):
     return JsonResponse(data)
 
 
-def link_pupils(request):
+@csrf_exempt
+def link_pupils(request, class_id):
     if request.method == 'POST':
-        pupil_ids = request.POST.getlist('ids[]')
-        class_id = request.session.get('class_id')
+        data = json.loads(request.body)
+        pupil_ids = data.get('ids', [])
         Pupils.objects.filter(id__in=pupil_ids).update(classes=class_id)
+        print(pupil_ids)
+        print(class_id)
+
         return JsonResponse({'success': 'Привязано успешно.'})
     return JsonResponse({'success': 'Ошибка при привязании.'})
 

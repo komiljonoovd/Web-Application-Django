@@ -243,8 +243,8 @@
         <div class="rows-per-page">
             <label for="rowsPerPage">Page size:</label>
             <select id="rowsPerPage" onchange="changeRowsPerPage()">
-                <option value="5" {% if rows_per_page == 5 %}selected{% endif %}>5</option>
                 <option value="10" {% if rows_per_page == 10 %}selected{% endif %}>10</option>
+                <option value="15" {% if rows_per_page == 15 %}selected{% endif %}>15</option>
                 <option value="20" {% if rows_per_page == 20 %}selected{% endif %}>20</option>
             </select>
         </div>

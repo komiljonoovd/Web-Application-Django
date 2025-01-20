@@ -29,7 +29,7 @@ urlpatterns = [
     path('evika-school/login/', auth_views.LoginView.as_view(next_page='main-page'), name='login_view'),
     path('evika-school/logout/', auth_views.LogoutView.as_view(next_page='login_view'), name='logout_view'),
     path('evika-school/check-auth/', auth_check, name='auth-check'),
-    path('', lambda request: redirect('/evika-school/login/', permanent=False)),
+    path('', lambda request: redirect('/evika-school/', permanent=False)),
     path('admin/', admin.site.urls),
     path('evika-school/', include('schoolapp.urls'))
 ]

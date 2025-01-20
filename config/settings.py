@@ -123,5 +123,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/evika-school/login/'
 LOGOUT_URL = '/evika-school/logout/'
-SESSION_COOKIE_AGE = 3600
+SESSION_COOKIE_AGE = 10800
 APPEND_SLASH = True

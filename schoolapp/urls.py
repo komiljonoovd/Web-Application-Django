@@ -27,7 +27,7 @@ urlpatterns = [
     path('restore-pupils/', restore_pupils, name='restore_pupils'),
     path('delete-pupils/', delete_pupils, name='delete_pupils'),
     path('unlink-pupils/', unlink_pupils, name='unlink_pupils'),
-    path('link-pupils/', link_pupils, name='link-pupils'),
+    path('link-pupils/<int:class_id>/', link_pupils, name='link-pupils'),
     path('not-linked-pupils/', not_linked_pupils, name='not-linked-pupils'),
 
     path('pupils/', pupil_list, name='pupils-list'),
