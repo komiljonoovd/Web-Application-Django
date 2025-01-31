@@ -25,6 +25,7 @@ class GenderAdmin(admin.ModelAdmin):
     list_per_page = 30
 
 
+
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
     list_display = ['id', 'type', 'createdon',
@@ -53,6 +54,8 @@ class PupilAdmin(admin.ModelAdmin):
     list_display_links = ['id', 'first_name', 'last_name', 'surname']
     list_per_page = 30
     ordering = ['id']
+    list_select_related = ['classes']
+
 
 
 @admin.register(Teachers)

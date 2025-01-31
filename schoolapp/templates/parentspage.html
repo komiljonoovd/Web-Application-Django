@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Родитель | EVRIKA SCHOOL</title>
+    <title>Родитель</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -53,11 +53,17 @@
         th, td {
             border: 1px solid #444;
             padding: 8px;
-            text-align: left;
+
             cursor: pointer;
+            font-weight: 700;
+
         }
         th {
             background: #333;
+        }
+        tr:hover {
+            background-color: #333; /* Более насыщенный серый цвет при наведении */
+            color: #4CAF50;;
         }
         .button-container {
             margin-bottom: 20px;
@@ -88,7 +94,7 @@
             text-align: center;
             color: white;
             margin-top: 10px;
-            height:300px;
+            height:500px;
         }
         .pagination-container {
             display: flex;
@@ -153,7 +159,7 @@
         <i class="fas fa-sync"></i>
     </button>
     <div class="button-container">
-        <button id="addButton" onclick="addClass()">+ New</button>
+        <button id="addButton" onclick="addParent()">+ New</button>
         <button id="deleteButton" onclick="deleteClasses()" disabled>Удалить</button>
         <button id="restoreButton" onclick="restoreClasses()" disabled>Восстановить</button>
         <input type="text" id="search" placeholder="Поиск..." value="{{ search_query }}">
@@ -225,12 +231,12 @@ function refreshPage() {
     location.reload();
 }
 
-function addPupil() {
-    window.location.href = '/evika-school/add-pupil/';
+function addParent() {
+    window.location.href = '/evika-school/add-parent/';
 }
 
 function editPupil(id) {
-    window.location.href = `/evika-school/edit-pupil/${id}/`;
+    window.location.href = `/evika-school/edit-parent/${id}/`;
 }
 
 function toggleAll(source) {

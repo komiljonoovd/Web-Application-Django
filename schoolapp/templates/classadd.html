@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Добавить класс | EVRIKA SCHOOL</title>
+    <title>Добавить класс</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -62,21 +62,30 @@
         .delete-button:hover {
             background-color: #d32f2f;
         }
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group select,
+        .form-group textarea {
+            width: 500px; /* Устанавливаем фиксированную ширину для всех полей */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; /* Учет padding и border в расчете ширины */
+        }
         .form-group {
             display: flex;
+            align-items: center;
             margin-bottom: 15px;
         }
         .form-group label {
-            width: 200px;
+            width: 150px; /* Ширина для всех меток */
             margin-right: 10px;
-            display: flex;
-            align-items: center;
         }
         input[type="text"], select {
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            flex-grow: 1;
+            width: 500px; /* Уменьшенная ширина */
         }
         #notification, #errorNotification {
            display: none;
@@ -116,27 +125,27 @@
 <form id="addClassForm" method="post" action="{% url 'add_class' %}">
     {% csrf_token %}
     <div class="form-group">
-        <label for="id_number">Number:</label>
+        <label for="id_number">Number *</label>
         {{ form.number }}
     </div>
 
     <div class="form-group">
-        <label for="id_letter">Letter:</label>
+        <label for="id_letter">Letter *</label>
         {{ form.letter }}
     </div>
 
     <div class="form-group">
-        <label for="id_isactive">Is In Process:</label>
-        {{ form.isactive }}
-    </div>
-
-    <div class="form-group">
-        <label for="id_teacher">Teacher:</label>
+        <label for="id_teacher">Teacher</label>
         {{ form.teacher }}
     </div>
+    <div class="form-group">
+        <label for="id_isactive">Is In Process</label>
+        {{ form.isactive }}
+
+    </div>
 
     <div class="form-group">
-        <label for="id_isdeleted">Is Deleted:</label>
+        <label for="id_isdeleted">Is Deleted</label>
         {{ form.isdeleted }}
     </div>
 </form>

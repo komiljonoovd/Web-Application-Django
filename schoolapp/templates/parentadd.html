@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавить Родителя</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #181818;
+            color: #fff;
+            padding: 20px;
+        }
+        h2 {
+            color: #4CAF50;
+            margin-top: -70px;
+            font-size: 28px;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        button {
+            margin-right: 10px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .back-button {
+            background: none;
+            border: none;
+            color: #4CAF50;
+            font-size: 24px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .delete-button {
+            background-color: #e53935;
+        }
+        .save-button {
+            background-color: #4CAF50;
+        }
+        .save-button:hover {
+            background-color: #388E3C;
+        }
+        .delete-button:hover {
+            background-color: #d32f2f;
+        }
+        .form-group input[type="text"],
+        .form-group select,
+        .form-group textarea {
+            width: 500px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .form-group {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            width: 200px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+        }
+        input[type="text"], select, input[type="date"], textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 480px;
+        }
+        #notification, #errorNotification {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1000;
+        }
+        #notification {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #errorNotification {
+            background-color: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="button-container">
+    <button type="button" class="back-button" onclick="window.location.href='/evika-school/parents/'">
+        <i class="fas fa-chevron-left"></i> Назад
+    </button>
+    <div>
+        <button type="button" class="delete-button" onclick="goBack()">Удалить</button>
+        <button type="submit" form="addPupilForm" class="save-button">Сохранить</button>
+    </div>
+</div>
+
+<center><h2>Добавить Родителя</h2></center>
+
+<form id="addPupilForm" method="post" action="{% url 'add_parent' %}">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="id_first_name">First Name *</label>
+        {{ form.first_name }}
+        <span class="error-message" id="error_first_name" style="display: none; color: red;">Это поле обязательно.</span>
+    </div>
+
+    <div class="form-group">
+        <label for="id_last_name">Last Name *</label>
+        {{ form.last_name }}
+        <span class="error-message" id="error_last_name" style="display: none; color: red;">Это поле обязательно.</span>
+    </div>
+
+    <div class="form-group">
+        <label for="id_surname">Surname</label>
+        {{ form.surname }}
+    </div>
+
+    <div class="form-group">
+        <label for="id_phone">Phone Number</label>
+        {{ form.phone }}
+    </div>
+
+    <div class="form-group">
+        <label for="id_isdeleted">Is Deleted </label>
+        {{ form.isdeleted }}
+    </div>
+
+    <div class="form-group">
+        <label for="id_note">Note</label>
+        {{ form.note }}
+    </div>
+</form>
+
+<div id="notification">Успешно добавлено.</div>
+<div id="errorNotification">Ошибка при добавлении.</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById('addPupilForm');
+
+    form.onsubmit = function (e) {
+        e.preventDefault();
+        let isValid = true;
+
+        // Сброс сообщений об ошибках
+        document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
+
+        // Проверка обязательных полей
+        const requiredFields = ['first_name', 'last_name'];
+        requiredFields.forEach(fieldName => {
+            const field = document.getElementById(`id_${fieldName}`);
+            if (!field || !field.value.trim()) {
+                isValid = false;
+                document.getElementById(`error_${fieldName}`).style.display = 'inline';
+            }
+        });
+
+        if (isValid) {
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Ошибка при отправке данных');
+                })
+                .then(data => {
+                    if (data.message) {
+                        showNotification('notification');
+                        setTimeout(() => {
+                            window.location.href = '/evika-school/parents/';
+                        }, 2000);
+                    } else {
+                        showNotification('errorNotification');
+                    }
+                })
+                .catch(() => {
+                    showNotification('errorNotification');
+                });
+        }
+    };
+
+    function showNotification(id) {
+        const notification = document.getElementById(id);
+        notification.style.display = 'block';
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 2000);
+    }
+
+    window.goBack = function () {
+        window.location.href = '/evika-school/parents/';
+    };
+});
+</script>
+
+</body>
+</html>
+

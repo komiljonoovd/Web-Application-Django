@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token }}"> <!-- Добавляем токен здесь -->
-    <title>Редактирование класса | EVIKA SCHOOL</title>
+    <title>Редактирование Преподователя</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -315,7 +315,7 @@
 <body>
 
 <div class="header">
-    <button class="back-button" onclick="window.location.href='/evika-school/classes/'">
+    <button class="back-button" onclick="window.location.href='/evika-school/teachers/'">
         <i class="fas fa-chevron-left"></i> Назад
     </button>
     <div>
@@ -324,45 +324,47 @@
     </div>
 </div>
 
-<center><h2>Редактирование  <i class="fas fa-edit"></i></h2></center>
+<center><h2>Редактирование Преподователя <i class="fas fa-edit"></i></h2></center>
 
 <div id="notification" class="notification"></div>
 
-<form id="editClassForm" method="post" action="{% url 'edit_class' class_instance.id %}">
+<form id="editClassForm" method="post" action="{% url 'edit_teacher' pupils_instance.id %}">
     {% csrf_token %}
-    <input type="hidden" id="classIdInput" value="{{ class_instance.id }}">
+    <input type="hidden" id="classIdInput" value="{{ pupils_instance.id }}">
+
+     <div class="form-group">
+        <label for="id_first_name">First Name *</label>
+        {{ form.first_name }}
+        <span class="error-message" id="error_first_name" style="display: none; color: red;">Это поле обязательно.</span>
+    </div>
 
     <div class="form-group">
-        <label for="id_number">Number *</label>
-        {{ form.number }}
+        <label for="id_last_name">Last Name *</label>
+        {{ form.last_name }}
+        <span class="error-message" id="error_last_name" style="display: none; color: red;">Это поле обязательно.</span>
     </div>
+
     <div class="form-group">
-        <label for="id_letter">Letter *</label>
-        {{ form.letter }}
+        <label for="id_surname">Surname</label>
+        {{ form.surname }}
     </div>
+
     <div class="form-group">
-        <label for="id_teacher">Teacher</label>
-        {{ form.teacher }}
-    </div>
-    <div class="form-group">
-        <label for="id_isactive">Is In Process</label>
-        {{ form.isactive }}
-    </div>
-    <div class="form-group">
-        <label for="id_isdeleted">Is Deleted</label>
+        <label for="id_isdeleted">Is Deleted </label>
         {{ form.isdeleted }}
     </div>
+
     <div class="form-group">
         <label>Создано:</label>
-        <input type="text" id="editCreatedBy" value="{{ created_by }}  {{ created_on|date:'H:i  d.m.Y' }}" class="info-field" disabled>
+        <input type="text" id="editCreatedBy" value="{{ created_by }}  {{ created_on|date:'d.m.Y H:i' }}" class="info-field" disabled>
     </div>
     <div class="form-group">
         <label>Изменено:</label>
-        <input type="text" id="editModifiedBy" value="{{ modified_by }}  {{ modified_on|date:'H:i  d.m.Y' }}" class="info-field" disabled>
+        <input type="text" id="editModifiedBy" value="{{ modified_by }}  {{ modified_on|date:'d.m.Y H:i' }}" class="info-field" disabled>
     </div>
 </form>
 
-<center><h3>Учащиеся текущего класса</h3></center>
+<center><h3>Классы текущего Преподователя</h3></center>
 <div class="action-buttons">
     <button type="button" class="save" onclick="window.location.href='/evika-school/add-pupil/'">+ New</button>
     <button type="button" class="link" id="linkButton" onclick="showLinkModal()">Link</button>
@@ -383,7 +385,7 @@
             <button class="close_button" onclick="closeLinkModal()">&times;</button>
         </div>
         <div class="title_modal">
-            <center>Список учащихся</center>
+            <center>Список не привязанных</center>
 
         </div>
 
@@ -407,7 +409,7 @@
                 {% for pupil in pupils %}
                 <tr>
                     <td>
-                        <input type="checkbox" name="selectPupil" value="{{ pupil.id }}" />
+                        <input type="checkbox" name="selectPupil" value="{{ pupil__id.id }}" />
                     </td>
                     <td>{{ pupil.name }}</td>
                 </tr>
@@ -441,12 +443,9 @@
     <thead>
         <tr>
             <th><input type="checkbox" onclick="toggleSelectAll(this)"></th>
-            <th><center>First name</center></th>
-            <th><center>Last name</center></th>
-            <th><center>Surname</center></th>
-            <th><center>Gender</center></th>
-            <th><center>Birthday</center></th>
-        </tr>
+            <th><center>Number</center></th>
+            <th><center>Letter</center></th>
+            <th><center>Is In Process</center></th>
     </thead>
     <tbody>
          {% for pupil in pupils %}
@@ -455,11 +454,18 @@
             <input type="checkbox" class="pupil-checkbox" value="{{ pupil.id }}"
                    onchange="toggleButtonStates()" onclick="event.stopPropagation(); toggleButtonStates(event)">
         </td>
-        <td>{{ pupil.first_name }}</td>
-        <td>{{ pupil.last_name }}</td>
-        <td>{{ pupil.surname|default:"" }}</td>
-        <td>{{ pupil.gender }}</td>
-        <td>{{ pupil.birthday|date:'d.m.Y' }}</td>
+        <td>{{ pupil.number }}</td>
+        <td>{{ pupil.letter }}</td>
+    <td><center>
+                        <span class="status-icon" onclick="editClass({{ class.id }})">
+                            {% if pupil.isactive %}
+                            <i class="fas fa-check-square" style="color: #4CAF50" ></i>
+                            {% else %}
+                            <i class="fas fa-times-circle" style="color: #f44336;"></i>
+                            {% endif %}
+                        </span>
+                    </center>
+                    </td>
         </tr>
         {% empty %}
         <tr>
@@ -492,7 +498,7 @@
 <script>
 
 function redirectToEditPage(pupilId) {
- window.location.href = `/evika-school/edit-pupil/${pupilId}/`;
+ window.location.href = `/evika-school/edit-class/${pupilId}/`;
 
 }
 </script>

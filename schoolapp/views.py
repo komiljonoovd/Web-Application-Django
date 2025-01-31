@@ -3,13 +3,13 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
-from schoolapp.models import Classes
+from schoolapp.models import Classes, ParentPupil
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from .models import Classes, Pupils, Teachers, Gender, Payment, Parents
 from django.views.decorators.csrf import csrf_exempt
 import json
-from .forms import ClassForm
+from .forms import ClassForm, PupilForm, ParentForm, TeacherForm
 
 
 @login_required
@@ -30,7 +30,7 @@ def class_list(request):
     except ValueError:
         rows_per_page = 20
 
-    classes = Classes.objects.all().order_by('-isactive','-number','letter')
+    classes = Classes.objects.all().order_by('-isactive', '-number', 'letter')
     if search_query:
         classes = classes.filter(
             number__iexact=search_query.capitalize()
@@ -88,7 +88,7 @@ def edit_class(request, pk):
 
             if int(number) < 1 or int(number) > 11:
                 error_messages.append('Классы существуют с 1-го до 11-го класса!')
-            if Classes.objects.filter(number=number, letter=letter,isactive=True).exclude(pk=pk).exists():
+            if Classes.objects.filter(number=number, letter=letter, isactive=True).exclude(pk=pk).exists():
                 error_messages.append(f'Класс "{number}-{letter}" уже существует!')
             if letter not in ['А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й',
                               'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У',
@@ -145,7 +145,7 @@ def edit_class(request, pk):
 
 
 @login_required
-def add_class(request, pk=None):
+def add_class(request):
     if request.method == 'POST':
         letters_list = ['А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й',
                         'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф',
@@ -157,7 +157,7 @@ def add_class(request, pk=None):
 
             error_messages = []
 
-            if Classes.objects.filter(number=number, letter=letter,isactive=True).exclude(pk=pk).exists():
+            if Classes.objects.filter(number=number, letter=letter, isactive=True).exists():
                 error_messages.append(f'Класс "{number}-{letter}" уже существует! ')
 
             # Проверка на допустимый диапазон классов
@@ -322,7 +322,7 @@ def pupil_list(request):
         rows_per_page = 20  # Если произошла ошибка, используем значение по умолчанию
 
     # Фильтрация классов по поисковому запросу
-    pupils = Pupils.objects.all().order_by('isdeleted', 'first_name')
+    pupils = Pupils.objects.select_related('classes').order_by('isdeleted', 'first_name')
     if search_query:
         pupils = pupils.filter(
             first_name__icontains=search_query.capitalize()
@@ -368,7 +368,7 @@ def restore_pupils_list(request):
         ids = request.POST.getlist('ids[]')
         Pupils.objects.filter(id__in=ids).update(isdeleted=False)
         return JsonResponse({'message': 'Успешно восстановлено.'})
-    return JsonResponse({'message': 'Ошибка при восстановлении учеников или учениц.'})
+    return JsonResponse({'message': 'Ошибка при восстановлении.'})
 
 
 @csrf_exempt
@@ -378,7 +378,7 @@ def restore_parents_list(request):
         ids = [int(i) for i in ids[0].split(',')]
         Parents.objects.filter(id__in=ids).update(isdeleted=False)
         return JsonResponse({'message': 'Успешно восстановлено.'})
-    return JsonResponse({'message': 'Ошибка при восстановлении Родителей.'})
+    return JsonResponse({'message': 'Ошибка при восстановлениий.'})
 
 
 @csrf_exempt
@@ -388,7 +388,7 @@ def delete_parents_list(request):
         ids = [int(i) for i in ids[0].split(',')]
         Parents.objects.filter(id__in=ids).update(isdeleted=True)
         return JsonResponse({'message': 'Успешно удалено.'})
-    return JsonResponse({'message': 'Ошибка при удалении Родителей.'})
+    return JsonResponse({'message': 'Ошибка при удалении.'})
 
 
 @login_required
@@ -632,3 +632,274 @@ def auth_check(request):
     is_authenticated = request.user.is_authenticated
     print(is_authenticated)
     return JsonResponse({'is_authenticated': is_authenticated})
+
+
+@login_required
+def add_pupil(request):
+    if request.method == 'POST':
+        print(request.method)
+        form = PupilForm(request.POST)
+        if form.is_valid():
+            pupil = form.save(commit=False)
+            pupil.createdby = request.user.username
+            pupil.save()
+            return JsonResponse({'message': 'Успешно добавлено !'}, status=200)
+        # Возврат ошибок в формате ключ-значение
+        return JsonResponse({'errors': form.errors.get_json_data()}, status=400)
+
+    # Используем только нужные поля для повышения производительности
+    classes = Classes.objects.filter(isdeleted=False, isactive=True).only('id', 'number', 'letter', 'teacher')
+
+    # Формируем список выбора для поля классов
+    class_choices = [
+        (
+            cls.id,
+            f"{cls.number}-{cls.letter}  {cls.teacher.last_name} {cls.teacher.first_name}"
+            if cls.teacher else f"{cls.number}-{cls.letter}"
+        )
+        for cls in classes
+    ]
+
+    form = PupilForm()
+    form.fields['classes'].choices = class_choices
+
+    # Возвращаем форму для отображения на фронтенде
+    return render(request, 'pupiladd.html', {'form': form})
+
+
+@login_required
+def add_parent(request):
+    if request.method == 'POST':
+        print(request.method)
+        form = ParentForm(request.POST)
+        if form.is_valid():
+            parent = form.save(commit=False)
+            parent.createdby = request.user.username
+            parent.save()
+            return JsonResponse({'message': 'Успешно добавлено !'}, status=200)
+        return JsonResponse({'errors': form.errors.get_json_data()}, status=400)
+
+    form = ParentForm()
+    return render(request, 'parentadd.html', {'form': form})
+
+
+@login_required
+def add_teacher(request):
+    if request.method == 'POST':
+        print(request.method)
+        form = TeacherForm(request.POST)
+        if form.is_valid():
+            teacher = form.save(commit=False)
+            teacher.createdby = request.user.username
+            teacher.save()
+            return JsonResponse({'message': 'Успешно добавлено !'}, status=200)
+        return JsonResponse({'errors': form.errors.get_json_data()}, status=400)
+
+    form = TeacherForm()
+    return render(request, 'teacheradd.html', {'form': form})
+
+
+@login_required
+def edit_pupils(request, pk):
+    pupils = get_object_or_404(Pupils, id=pk)
+
+    if request.method == 'POST':
+        form = PupilForm(request.POST, instance=pupils)
+        if form.is_valid():
+            # Save changes if no errors
+            pupils = form.save(commit=False)
+            pupils.modifiedby = request.user.username
+            pupils.modifiedon = timezone.now()
+            pupils.save()
+            return JsonResponse({'success': True, 'redirect_url': '/evika-school/pupils/'})
+
+        return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+
+    form = PupilForm(instance=pupils)
+
+    # Формирование списка классов для выбора
+    classes = Classes.objects.filter(isdeleted=False, isactive=True).only('id', 'number', 'letter', 'teacher')
+    class_choices = [
+        (
+            cls.id,
+            f"{cls.number}-{cls.letter}  {cls.teacher.last_name} {cls.teacher.first_name}"
+            if cls.teacher else f"{cls.number}-{cls.letter}"
+        )
+        for cls in classes
+    ]
+    form.fields['classes'].choices = class_choices
+
+    # Пагинация списка родителей
+    parent_list = ParentPupil.objects.filter(pupil=pk).values('parent__id', 'parent__first_name', 'parent__last_name',
+                                                              'parent__surname', 'parent__phone')
+
+    page_number = request.GET.get('page', 1)
+    rows_per_page = request.GET.get('rows_per_page', 10)
+    try:
+        rows_per_page = int(rows_per_page)
+        if rows_per_page <= 0:
+            rows_per_page = 10
+    except ValueError:
+        rows_per_page = 10
+
+    paginator = Paginator(parent_list, rows_per_page)
+    try:
+        page_obj = paginator.get_page(page_number)
+    except ValueError:
+        page_obj = paginator.get_page(paginator.num_pages)
+
+    # Формирование данных о последних изменениях
+    if not pupils.modifiedby:
+        modifiedby = 'Нет изменений'
+        modifiedon = ''
+    else:
+        modifiedby = pupils.modifiedby
+        modifiedon = pupils.modifiedon
+
+    return render(request, 'pupiledit.html', {
+        'form': form,
+        'pupils_instance': pupils,
+        'created_by': pupils.createdby,
+        'created_on': pupils.createdon,
+        'modified_by': modifiedby,
+        'modified_on': modifiedon,
+        'pupils': page_obj,
+        'page_obj': page_obj,
+        'rows_per_page': rows_per_page,
+    })
+
+
+#
+@login_required
+def edit_parents(request, pk):
+    parents = get_object_or_404(Parents, id=pk)
+
+    if request.method == 'POST':
+        form = ParentForm(request.POST, instance=parents)
+        print(form)
+
+        if form.is_valid():
+            # Save changes if no errors
+            pupils = form.save(commit=False)
+            pupils.modifiedby = request.user.username
+            pupils.modifiedon = timezone.now()
+            pupils.save()
+            return JsonResponse({'success': True, 'redirect_url': '/evika-school/classes/'})
+
+        return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+
+    form = ParentForm(instance=parents)
+
+    pupil_list = ParentPupil.objects.filter(parent=pk).values(
+        'pupil__id',
+        'pupil__first_name',
+        'pupil__last_name',
+        'pupil__surname',
+        'pupil__gender',
+        'pupil__birthday',
+        'pupil__classes__number',
+        'pupil__classes__letter',
+        'pupil__classes__teacher__first_name',
+        'pupil__classes__teacher__last_name',
+        'pupil__classes__teacher__surname'
+    )
+
+    page_number = request.GET.get('page', 1)
+    rows_per_page = request.GET.get('rows_per_page', 10)
+    try:
+        rows_per_page = int(rows_per_page)
+        if rows_per_page <= 0:
+            rows_per_page = 10
+    except ValueError:
+        rows_per_page = 10
+
+    paginator = Paginator(pupil_list, rows_per_page)
+    page_obj = paginator.get_page(page_number)
+
+    if not parents.modifiedby:
+        modifiedby = 'Нет изменений'
+        modifiedon = ''
+    else:
+        modifiedby = parents.modifiedby
+        modifiedon = parents.modifiedon
+
+    # classes = Classes.objects.filter(isdeleted=False, isactive=True).only('id', 'number', 'letter', 'teacher')
+    #
+    # # Формируем список выбора для поля классов
+    # class_choices = [
+    #     (
+    #         cls.id,
+    #         f"{cls.number}-{cls.letter}  {cls.teacher.last_name} {cls.teacher.first_name}"
+    #         if cls.teacher else f"{cls.number}-{cls.letter}"
+    #     )
+    #     for cls in classes
+    # ]
+    #
+    # form = PupilForm()
+    # form.fields['classes'].choices = class_choices
+
+    return render(request, 'parentedit.html', {
+        'form': form,
+        'pupils_instance': parents,
+        'created_by': parents.createdby,
+        'created_on': parents.createdon,
+        'modified_by': modifiedby,
+        'modified_on': modifiedon,
+        'pupils': page_obj,
+        'page_obj': page_obj,
+        'rows_per_page': rows_per_page,
+    })
+
+
+@login_required
+def edit_teachers(request, pk):
+    teacher = get_object_or_404(Teachers, id=pk)
+
+    if request.method == 'POST':
+        form = TeacherForm(request.POST, instance=teacher)
+        print(form)
+
+        if form.is_valid():
+            pupils = form.save(commit=False)
+            pupils.modifiedby = request.user.username
+            pupils.modifiedon = timezone.now()
+            pupils.save()
+            return JsonResponse({'success': True, 'redirect_url': '/evika-school/classes/'})
+
+        return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+
+    form = TeacherForm(instance=teacher)
+
+    classes_list = Classes.objects.filter(teacher=pk).order_by('-number', '-isactive').values('id', 'number', 'letter',
+                                                                                             'isactive')
+
+    page_number = request.GET.get('page', 1)
+    rows_per_page = request.GET.get('rows_per_page', 10)
+    try:
+        rows_per_page = int(rows_per_page)
+        if rows_per_page <= 0:
+            rows_per_page = 10
+    except ValueError:
+        rows_per_page = 10
+
+    paginator = Paginator(classes_list, rows_per_page)
+    page_obj = paginator.get_page(page_number)
+
+    if not teacher.modifiedby:
+        modifiedby = 'Нет изменений'
+        modifiedon = ''
+    else:
+        modifiedby = teacher.modifiedby
+        modifiedon = teacher.modifiedon
+
+    return render(request, 'teacheredit.html', {
+        'form': form,
+        'pupils_instance': teacher,
+        'created_by': teacher.createdby,
+        'created_on': teacher.createdon,
+        'modified_by': modifiedby,
+        'modified_on': modifiedon,
+        'pupils': page_obj,
+        'page_obj': page_obj,
+        'rows_per_page': rows_per_page,
+    })

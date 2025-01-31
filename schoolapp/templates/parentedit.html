@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token }}"> <!-- Добавляем токен здесь -->
-    <title>Редактирование класса | EVIKA SCHOOL</title>
+    <title>Редактирование РодителяL</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -324,41 +324,52 @@
     </div>
 </div>
 
-<center><h2>Редактирование  <i class="fas fa-edit"></i></h2></center>
+<center><h2>Редактирование Родителя <i class="fas fa-edit"></i></h2></center>
 
 <div id="notification" class="notification"></div>
 
-<form id="editClassForm" method="post" action="{% url 'edit_class' class_instance.id %}">
+<form id="editClassForm" method="post" action="{% url 'edit_parent' pupils_instance.id %}">
     {% csrf_token %}
-    <input type="hidden" id="classIdInput" value="{{ class_instance.id }}">
+    <input type="hidden" id="classIdInput" value="{{ pupils_instance.id }}">
+
+     <div class="form-group">
+        <label for="id_first_name">First Name *</label>
+        {{ form.first_name }}
+        <span class="error-message" id="error_first_name" style="display: none; color: red;">Это поле обязательно.</span>
+    </div>
 
     <div class="form-group">
-        <label for="id_number">Number *</label>
-        {{ form.number }}
+        <label for="id_last_name">Last Name *</label>
+        {{ form.last_name }}
+        <span class="error-message" id="error_last_name" style="display: none; color: red;">Это поле обязательно.</span>
     </div>
+
     <div class="form-group">
-        <label for="id_letter">Letter *</label>
-        {{ form.letter }}
+        <label for="id_surname">Surname</label>
+        {{ form.surname }}
     </div>
+
     <div class="form-group">
-        <label for="id_teacher">Teacher</label>
-        {{ form.teacher }}
+        <label for="id_phone">Phone Number</label>
+        {{ form.phone }}
     </div>
+
     <div class="form-group">
-        <label for="id_isactive">Is In Process</label>
-        {{ form.isactive }}
-    </div>
-    <div class="form-group">
-        <label for="id_isdeleted">Is Deleted</label>
+        <label for="id_isdeleted">Is Deleted </label>
         {{ form.isdeleted }}
+    </div>
+
+    <div class="form-group">
+        <label for="id_note">Note</label>
+        {{ form.note }}
     </div>
     <div class="form-group">
         <label>Создано:</label>
-        <input type="text" id="editCreatedBy" value="{{ created_by }}  {{ created_on|date:'H:i  d.m.Y' }}" class="info-field" disabled>
+        <input type="text" id="editCreatedBy" value="{{ created_by }}  {{ created_on|date:'d.m.Y H:i' }}" class="info-field" disabled>
     </div>
     <div class="form-group">
         <label>Изменено:</label>
-        <input type="text" id="editModifiedBy" value="{{ modified_by }}  {{ modified_on|date:'H:i  d.m.Y' }}" class="info-field" disabled>
+        <input type="text" id="editModifiedBy" value="{{ modified_by }}  {{ modified_on|date:'d.m.Y H:i' }}" class="info-field" disabled>
     </div>
 </form>
 
@@ -383,7 +394,7 @@
             <button class="close_button" onclick="closeLinkModal()">&times;</button>
         </div>
         <div class="title_modal">
-            <center>Список учащихся</center>
+            <center>Список не привязанных</center>
 
         </div>
 
@@ -407,7 +418,7 @@
                 {% for pupil in pupils %}
                 <tr>
                     <td>
-                        <input type="checkbox" name="selectPupil" value="{{ pupil.id }}" />
+                        <input type="checkbox" name="selectPupil" value="{{ pupil__id.id }}" />
                     </td>
                     <td>{{ pupil.name }}</td>
                 </tr>
@@ -446,20 +457,23 @@
             <th><center>Surname</center></th>
             <th><center>Gender</center></th>
             <th><center>Birthday</center></th>
+            <th><center>Class</center></th>
         </tr>
     </thead>
     <tbody>
          {% for pupil in pupils %}
-    <tr ondblclick="redirectToEditPage({{ pupil.id }})">
+    <tr ondblclick="redirectToEditPage({{ pupil.pupil__id }})">
         <td>
-            <input type="checkbox" class="pupil-checkbox" value="{{ pupil.id }}"
+            <input type="checkbox" class="pupil-checkbox" value="{{ pupil.pupil__id }}"
                    onchange="toggleButtonStates()" onclick="event.stopPropagation(); toggleButtonStates(event)">
         </td>
-        <td>{{ pupil.first_name }}</td>
-        <td>{{ pupil.last_name }}</td>
-        <td>{{ pupil.surname|default:"" }}</td>
-        <td>{{ pupil.gender }}</td>
-        <td>{{ pupil.birthday|date:'d.m.Y' }}</td>
+        <td>{{ pupil.pupil__first_name }}</td>
+        <td>{{ pupil.pupil__last_name }}</td>
+        <td>{{ pupil.pupil__surname|default:"" }}</td>
+        <td>{{ pupil.pupil__gender }}</td>
+        <td>{{ pupil.pupil__birthday|date:"d.m.Y" }}</td>
+        <td>{{ pupil.pupil__classes__number|default:"" }}-{{ pupil.pupil__classes__letter|default:"" }} {{ pupil.pupil__classes__teacher__first_name|default:"" }} {{ pupil.pupil__classes__teacher__last_name|default:"" }} {{ pupil.pupil__classes__teacher__surname|default:"" }}</td>
+
         </tr>
         {% empty %}
         <tr>

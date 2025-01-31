@@ -55,9 +55,15 @@
             padding: 8px;
             text-align: left;
             cursor: pointer;
+            font-weight: 700;
+
         }
         th {
             background: #333;
+        }
+        tr:hover {
+            background-color: #333; /* Более насыщенный серый цвет при наведении */
+            color: #4CAF50;;
         }
         .button-container {
             margin-bottom: 20px;
@@ -92,7 +98,7 @@
             text-align: center;
             color: white;
             margin-top: 10px;
-            height:300px;
+            height:500px;
         }
         .pagination-container {
             display: flex;
@@ -149,15 +155,15 @@
 </head>
 <body>
 
-<button class="back-button" onclick="goBack()"><i class="fas fa-arrow-left"></i> Назад</button>
+<button class="back-button" onclick="goBack()"><i class="fas fa-chevron-left"></i> Назад</button>
 <div class="content" id="tableContainer">
 
-    <center><h2>Ученики и Ученицы <i class="fas fa-user-graduate"></i></h2></center>
+    <center><h2>Ученики(цы) <i class="fas fa-user-graduate"></i></h2></center>
     <button class="refresh-button" onclick="refreshPage()">
         <i class="fas fa-sync"></i>
     </button>
     <div class="button-container">
-        <button id="addButton" onclick="addClass()">+ New</button>
+        <button id="addButton" onclick="addPupil()">+ New</button>
         <button id="deleteButton" onclick="deleteClasses()" disabled>Удалить</button>
         <button id="restoreButton" onclick="restoreClasses()" disabled>Восстановить</button>
         <input type="text" id="search" placeholder="Поиск..." value="{{ search_query }}">
@@ -178,7 +184,7 @@
         <tbody>
             {% if page_obj %}
                 {% for pupil in page_obj %}
-                <tr data-id="{{ class.id }}">
+                <tr data-id="{{ pupil.id }}">
                     <td><input type="checkbox" name="selectClass" value="{{ pupil.id }}" onchange="updateButtonStates()"></td>
                     <td class="link" onclick="editPupil({{ pupil.id }})">{{ pupil.first_name }}</td>
                     <td class="link" onclick="editPupil({{ pupil.id }})">{{ pupil.last_name }}</td>
@@ -216,8 +222,8 @@
         <div class="rows-per-page">
             <label for="rowsPerPage">Page size:</label>
             <select id="rowsPerPage" onchange="changeRowsPerPage()">
-                <option value="5" {% if rows_per_page == 5 %}selected{% endif %}>5</option>
                 <option value="10" {% if rows_per_page == 10 %}selected{% endif %}>10</option>
+                <option value="15" {% if rows_per_page == 15 %}selected{% endif %}>15</option>
                 <option value="20" {% if rows_per_page == 20 %}selected{% endif %}>20</option>
             </select>
         </div>

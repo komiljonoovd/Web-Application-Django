@@ -9,7 +9,8 @@ from schoolapp.views import (all_entities, class_list,
                              teachers_list, delete_teachers_list, restore_teachers_list,
                              payment_list, delete_payment_list, restore_payment_list,
                              gender_list, restore_gender_list, delete_gender_list,
-                             not_linked_pupils, link_pupils
+                             not_linked_pupils, link_pupils, add_pupil, add_parent, add_teacher, edit_pupils,
+                             edit_parents, edit_teachers
                              )
 
 urlpatterns = [
@@ -30,15 +31,21 @@ urlpatterns = [
     path('link-pupils/<int:class_id>/', link_pupils, name='link-pupils'),
     path('not-linked-pupils/', not_linked_pupils, name='not-linked-pupils'),
 
+    path('add-pupil/', add_pupil, name='add_pupil'),
     path('pupils/', pupil_list, name='pupils-list'),
+    path('edit-pupil/<int:pk>/', edit_pupils, name='edit_pupils'),
     path('delete-pupils', delete_pupils_list, name='delete-pupils-list'),
     path('restore-pupils', restore_pupils_list, name='restore-pupils-list'),
 
     path('parents/', parent_list, name='parent-list'),
+    path('edit-parent/<int:pk>/',edit_parents,name='edit_parent'),
+    path('add-parent/', add_parent, name='add_parent'),
     path('delete-parents/', delete_parents_list, name='delete-parents-list'),
     path('restore-parents/', restore_parents_list, name='restore-parents-list'),
 
     path('teachers/', teachers_list, name='parent-list'),
+    path('edit-teacher/<int:pk>/',edit_teachers,name='edit_teacher'),
+    path('add-teacher/', add_teacher, name='add_teacher'),
     path('delete-teachers/', delete_teachers_list, name='delete_teachers_list'),
     path('restore-teachers/', restore_teachers_list, name='restore_teachers_list'),
 

@@ -20,7 +20,6 @@ from django.shortcuts import redirect
 from django.contrib.auth import views as auth_views
 from schoolapp.views import auth_check
 
-
 admin.site.site_header = ' '
 admin.site.site_title = 'ADMIN PANEL'
 admin.site.index_title = 'EVIKA SCHOOL'

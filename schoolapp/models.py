@@ -67,7 +67,7 @@ class Parents(models.Model):
     first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
     surname = models.CharField(max_length=128, blank=True)
-    phone = models.CharField(max_length=20)
+    phone = models.CharField(max_length=50,blank=True,null=True)
     createdon = models.DateTimeField(auto_now_add=True)
     modifiedon = models.DateTimeField(auto_now=True)
     createdby = models.CharField(max_length=128)
@@ -107,7 +107,8 @@ class Pupils(models.Model):
     note = models.TextField(blank=True)
 
     def __str__(self):
-        return ' '.join(filter(None, [self.first_name, self.last_name, self.surname]))
+        return f"{self.first_name} {self.last_name}"
+
 
     # def clean(self):
     #     if self.pk and not self.modifiedby:
@@ -129,7 +130,7 @@ class ParentPupil(models.Model):
 
     class Meta:
         unique_together = ('parent', 'pupil')
-        db_table = 'ParentsAndPupils'
+        db_table = 'Parents And Pupils'
         verbose_name = 'Parents And Pupils'
         verbose_name_plural = 'Parents And Pupils'
 

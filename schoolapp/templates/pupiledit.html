@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token }}"> <!-- Добавляем токен здесь -->
-    <title>Редактирование класса | EVIKA SCHOOL</title>
+    <title>Редактирование ученика(цы)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -50,8 +50,24 @@
             cursor: pointer;
             margin-bottom: 20px;
         }
+        .form-group {
+            display: flex;
+            margin-bottom: 15px;
+<!--        }-->
+<!--        .form-group label {-->
+<!--            width: 200px;-->
+<!--            margin-right: 10px;-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--        }-->
+<!--        input[type="text"], select {-->
+<!--            padding: 10px;-->
+<!--            border: 1px solid #ccc;-->
+<!--            border-radius: 5px;-->
+<!--            flex-grow: 1;-->
+<!--        }-->
+
         .form-group input[type="text"],
-        .form-group input[type="number"],
         .form-group select,
         .form-group textarea {
             width: 500px;
@@ -76,7 +92,7 @@
             border-radius: 5px;
             width: 60px;
         }
-        input[type="text"] {
+        input[type="date"] {
             width: 100%;
             max-width: 500px;
             padding: 10px;
@@ -84,22 +100,6 @@
             border-radius: 5px;
             box-sizing: border-box;
         }
-<!--        .form-group {-->
-<!--            display: flex;-->
-<!--            margin-bottom: 15px;-->
-<!--        }-->
-<!--        .form-group label {-->
-<!--            width: 200px;-->
-<!--            margin-right: 10px;-->
-<!--            display: flex;-->
-<!--            align-items: center;-->
-<!--        }-->
-<!--        input[type="text"], select {-->
-<!--            padding: 10px;-->
-<!--            border: 1px solid #ccc;-->
-<!--            border-radius: 5px;-->
-<!--            flex-grow: 1;-->
-<!--        }-->
         button {
             margin-right: 10px;
             padding: 10px;
@@ -308,14 +308,47 @@
             color: white;
             border-color: #4CAF50;
         }
+        .form-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px; /* Расстояние между колонками */
+    }
+        .form-column {
+        flex: 1; /* Равная ширина колонок */
+    }
 
+    .form-group {
+        margin-bottom: 20px; /* Расстояние между полями */
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    input,
+    select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+
+    .error-message {
+        display: none; /* Ошибки изначально скрыты */
+        color: red;
+        font-size: 12px;
+        margin-top: 5px;
+    }
 
     </style>
 </head>
 <body>
 
 <div class="header">
-    <button class="back-button" onclick="window.location.href='/evika-school/classes/'">
+    <button class="back-button" onclick="window.location.href='/evika-school/pupils/'">
         <i class="fas fa-chevron-left"></i> Назад
     </button>
     <div>
@@ -328,50 +361,269 @@
 
 <div id="notification" class="notification"></div>
 
-<form id="editClassForm" method="post" action="{% url 'edit_class' class_instance.id %}">
+<form id="editClassForm" method="post" action="{% url 'edit_pupils' pupils_instance.id %}">
     {% csrf_token %}
-    <input type="hidden" id="classIdInput" value="{{ class_instance.id }}">
+    <input type="hidden" id="classIdInput" value="{{ pupils_instance.id }}">
 
-    <div class="form-group">
-        <label for="id_number">Number *</label>
-        {{ form.number }}
-    </div>
-    <div class="form-group">
-        <label for="id_letter">Letter *</label>
-        {{ form.letter }}
-    </div>
-    <div class="form-group">
-        <label for="id_teacher">Teacher</label>
-        {{ form.teacher }}
-    </div>
-    <div class="form-group">
-        <label for="id_isactive">Is In Process</label>
-        {{ form.isactive }}
-    </div>
-    <div class="form-group">
-        <label for="id_isdeleted">Is Deleted</label>
-        {{ form.isdeleted }}
-    </div>
-    <div class="form-group">
-        <label>Создано:</label>
-        <input type="text" id="editCreatedBy" value="{{ created_by }}  {{ created_on|date:'H:i  d.m.Y' }}" class="info-field" disabled>
-    </div>
-    <div class="form-group">
-        <label>Изменено:</label>
-        <input type="text" id="editModifiedBy" value="{{ modified_by }}  {{ modified_on|date:'H:i  d.m.Y' }}" class="info-field" disabled>
-    </div>
-</form>
+    <div class="form-container">
+    <!-- Левая колонка -->
+    <div class="form-column">
+        <div class="form-group">
+            <label for="id_first_name">First Name *</label>
+            {{ form.first_name }}
+            <span class="error-message" id="error_first_name" style="display: none; color: red;">Это поле обязательно.</span>
+        </div>
 
-<center><h3>Учащиеся текущего класса</h3></center>
+        <div class="form-group">
+            <label for="id_last_name">Last Name *</label>
+            {{ form.last_name }}
+            <span class="error-message" id="error_last_name" style="display: none; color: red;">Это поле обязательно.</span>
+        </div>
+
+        <div class="form-group">
+            <label for="id_surname">Surname</label>
+            {{ form.surname }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_gender">Gender *</label>
+            {{ form.gender }}
+            <span class="error-message" id="error_gender" style="display: none; color: red;">Пожалуйста, выберите пол.</span>
+        </div>
+
+        <div class="form-group">
+            <label for="id_birthday">Birthday *</label>
+            {{ form.birthday }}
+        </div>
+
+                      <div class="form-group">
+            <label for="id_classes">Class *</label>
+            {{ form.classes }}
+            <span class="error-message" id="error_classes" style="display: none; color: red;">Выберите класс.</span>
+        </div>
+
+        <div class="form-group">
+            <label for="id_isdeleted">Is Deleted</label>
+            {{ form.isdeleted }}
+        </div>
+
+
+<!--        <div class="form-group">-->
+<!--        <label for="id_note">Note</label>-->
+<!--            {{ form.note }}-->
+<!--        </div>-->
+
+<!--        <div class="form-group">-->
+<!--            <label for="id_isdeleted">Is Deleted</label>-->
+<!--            {{ form.isdeleted }}-->
+<!--        </div>-->
+
+
+
+<!--        <div class="form-group">-->
+<!--            <label for="id_classes">Class *</label>-->
+<!--            {{ form.classes }}-->
+<!--            <span class="error-message" id="error_classes" style="display: none; color: red;">Выберите класс.</span>-->
+<!--        </div>-->
+<!--        <div class="form-group">-->
+<!--            <label for="id_isdeleted">Is Deleted</label>-->
+<!--            {{ form.isdeleted }}-->
+<!--        </div>-->
+    </div>
+
+    <!-- Правая колонка -->
+    <div class="form-column">
+            <div class="form-group">
+        <label for="id_note">Note</label>
+            {{ form.note }}
+        </div>
+
+<!--                <div class="form-group">-->
+<!--            <label for="id_isdeleted">Is Deleted</label>-->
+<!--            {{ form.isdeleted }}-->
+<!--        </div>-->
+
+
+        <div class="form-group">
+    <label>Создано:</label>
+    <input type="text" id="editCreatedBy" value="{{ created_by }}  {{ created_on|date:'d.m.Y  H:i' }}" class="info-field" disabled>
+</div>
+<div class="form-group">
+    <label>Изменено:</label>
+    <input type="text" id="editModifiedBy" value="{{ modified_by }}  {{ modified_on|date:'d.m.Y  H:i' }}" class="info-field" disabled>
+</div>
+
+
+
+<!--                <div class="form-group">-->
+<!--            <label for="id_classes">Class *</label>-->
+<!--            {{ form.classes }}-->
+<!--            <span class="error-message" id="error_classes" style="display: none; color: red;">Выберите класс.</span>-->
+<!--        </div>-->
+
+<!--        <div class="form-group">-->
+<!--        <label for="id_note">Note</label>-->
+<!--            {{ form.note }}-->
+<!--        </div>-->
+<!--        <div class="form-group">-->
+<!--            <label for="id_isdeleted">Is Deleted</label>-->
+<!--            {{ form.isdeleted }}-->
+<!--        </div>-->
+
+
+
+<!--        <div class="form-group">-->
+<!--            <label for="id_gender">Gender *</label>-->
+<!--            {{ form.gender }}-->
+<!--            <span class="error-message" id="error_gender" style="display: none; color: red;">Пожалуйста, выберите пол.</span>-->
+<!--        </div>-->
+
+<!--        <div class="form-group">-->
+<!--            <label for="id_birthday">Birthday *</label>-->
+<!--            {{ form.birthday }}-->
+<!--        </div>-->
+
+<!--        <div class="form-group">-->
+<!--            <label for="id_classes">Class *</label>-->
+<!--            {{ form.classes }}-->
+<!--            <span class="error-message" id="error_classes" style="display: none; color: red;">Выберите класс.</span>-->
+<!--        </div>-->
+
+<!--        <div class="form-group">-->
+<!--        <label for="id_note">Note</label>-->
+<!--            {{ form.note }}-->
+<!--        </div>-->
+<!--        <div class="form-group">-->
+<!--            <label for="id_isdeleted">Is Deleted</label>-->
+<!--            {{ form.isdeleted }}-->
+<!--        </div>-->
+
+
+
+    </div>
+</div>
+
+<!--<div class="form-group">-->
+<!--    <label for="id_note">Note</label>-->
+<!--    {{ form.note }}-->
+<!--</div>-->
+
+<!--<div class="form-group">-->
+<!--    <label>Создано:</label>-->
+<!--    <input type="text" id="editCreatedBy" value="{{ created_by }}  {{ created_on|date:'d.m.Y  H:i' }}" class="info-field" disabled>-->
+<!--</div>-->
+<!--<div class="form-group">-->
+<!--    <label>Изменено:</label>-->
+<!--    <input type="text" id="editModifiedBy" value="{{ modified_by }}  {{ modified_on|date:'d.m.Y  H:i' }}" class="info-field" disabled>-->
+<!--</div>-->
+
+<!--    <div class="form-container">-->
+<!--    &lt;!&ndash; Левая колонка &ndash;&gt;-->
+<!--    <div class="form-column">-->
+<!--        <div class="form-group">-->
+<!--            <label for="id_first_name">First Name *</label>-->
+<!--            {{ form.first_name }}-->
+<!--            <span class="error-message" id="error_first_name" style="display: none; color: red;">Это поле обязательно.</span>-->
+<!--        </div>-->
+
+<!--        <div class="form-group">-->
+<!--            <label for="id_last_name">Last Name *</label>-->
+<!--            {{ form.last_name }}-->
+<!--            <span class="error-message" id="error_last_name" style="display: none; color: red;">Это поле обязательно.</span>-->
+<!--        </div>-->
+
+<!--        <div class="form-group">-->
+<!--            <label for="id_surname">Surname</label>-->
+<!--            {{ form.surname }}-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Правая колонка &ndash;&gt;-->
+<!--    <div class="form-column">-->
+<!--        <div class="form-group">-->
+<!--            <label for="id_gender">Gender *</label>-->
+<!--            {{ form.gender }}-->
+<!--            <span class="error-message" id="error_gender" style="display: none; color: red;">Пожалуйста, выберите пол.</span>-->
+<!--        </div>-->
+
+<!--        <div class="form-group">-->
+<!--            <label for="id_birthday">Birthday *</label>-->
+<!--            {{ form.birthday }}-->
+<!--        </div>-->
+
+<!--        <div class="form-group">-->
+<!--            <label for="id_classes">Class *</label>-->
+<!--            {{ form.classes }}-->
+<!--            <span class="error-message" id="error_classes" style="display: none; color: red;">Выберите класс.</span>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+
+<!--        <div class="form-group">-->
+<!--        <label for="id_first_name">First Name *</label>-->
+<!--        {{ form.first_name }}-->
+<!--        <span class="error-message" id="error_first_name" style="display: none; color: red;">Это поле обязательно.</span>-->
+<!--    </div>-->
+
+<!--    <div class="form-group">-->
+<!--        <label for="id_last_name">Last Name *</label>-->
+<!--        {{ form.last_name }}-->
+<!--        <span class="error-message" id="error_last_name" style="display: none; color: red;">Это поле обязательно.</span>-->
+<!--    </div>-->
+
+<!--    <div class="form-group">-->
+<!--        <label for="id_surname">Surname</label>-->
+<!--        {{ form.surname }}-->
+<!--    </div>-->
+
+<!--    <div class="form-group">-->
+<!--        <label for="id_gender">Gender *</label>-->
+<!--        {{ form.gender }}-->
+<!--        <span class="error-message" id="error_gender" style="display: none; color: red;">Пожалуйста, выберите пол.</span>-->
+<!--    </div>-->
+
+<!--    <div class="form-group">-->
+<!--        <label for="id_birthday">Birthday *</label>-->
+<!--        {{ form.birthday }}-->
+<!--    </div>-->
+
+<!--    <div class="form-group">-->
+<!--        <label for="id_classes">Class *</label>-->
+<!--        {{ form.classes }}-->
+<!--        <span class="error-message" id="error_classes" style="display: none; color: red;">Выберите класс.</span>-->
+<!--    </div>-->
+
+<!--    <div class="form-group">-->
+<!--        <label for="id_isdeleted">Is Deleted </label>-->
+<!--        {{ form.isdeleted }}-->
+<!--    </div>-->
+
+<!--    <div class="form-group">-->
+<!--        <label for="id_note">Note</label>-->
+<!--        {{ form.note }}-->
+<!--    </div>-->
+<!--</form>-->
+<!--    <div class="form-group">-->
+<!--        <label>Создано:</label>-->
+<!--        <input type="text" id="editCreatedBy" value="{{ created_by }}  {{ created_on|date:' d.m.Y  H:i' }}" class="info-field" disabled>-->
+<!--    </div>-->
+<!--    <div class="form-group">-->
+<!--        <label>Изменено:</label>-->
+<!--        <input type="text" id="editModifiedBy" value="{{ modified_by }}  {{ modified_on|date:'d.m.Y  H:i' }}" class="info-field" disabled>-->
+<!--    </div>-->
+<!--</form>-->
+
+<center><h3>Родители текущего ученика(цы)</h3></center>
 <div class="action-buttons">
-    <button type="button" class="save" onclick="window.location.href='/evika-school/add-pupil/'">+ New</button>
+    <button type="button" class="save" onclick="window.location.href='/evika-school/add-parent/'">+ New</button>
     <button type="button" class="link" id="linkButton" onclick="showLinkModal()">Link</button>
     <button type="button" class="unlink" id="unlinkButton" onclick="showUnlinkModal()" disabled>Unlink</button>
     <button type="button" class="delete" id="deleteButton" onclick="deleteSelectedPupils()" disabled>Удалить</button>
     <button type="button" class="restore" id="restoreButton" onclick="restoreSelectedPupils()" disabled>Восстановить</button>
 
     <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Поиск ученика..."/>
+        <input type="text" id="searchInput" placeholder="Поиск..."/>
         <button class="search-button" onclick="handleSearch()">Искать</button>
     </div>
 </div>
@@ -383,7 +635,7 @@
             <button class="close_button" onclick="closeLinkModal()">&times;</button>
         </div>
         <div class="title_modal">
-            <center>Список учащихся</center>
+            <center>Список не привязанных</center>
 
         </div>
 
@@ -444,22 +696,22 @@
             <th><center>First name</center></th>
             <th><center>Last name</center></th>
             <th><center>Surname</center></th>
-            <th><center>Gender</center></th>
-            <th><center>Birthday</center></th>
+            <th><center>Phone</center></th>
+<!--            <th><center>Birthday</center></th>-->
         </tr>
     </thead>
     <tbody>
          {% for pupil in pupils %}
-    <tr ondblclick="redirectToEditPage({{ pupil.id }})">
+    <tr ondblclick="redirectToEditPage({{ pupil.parent__id }})">
         <td>
-            <input type="checkbox" class="pupil-checkbox" value="{{ pupil.id }}"
+            <input type="checkbox" class="pupil-checkbox" value="{{ pupil.parent__id }}"
                    onchange="toggleButtonStates()" onclick="event.stopPropagation(); toggleButtonStates(event)">
         </td>
-        <td>{{ pupil.first_name }}</td>
-        <td>{{ pupil.last_name }}</td>
-        <td>{{ pupil.surname|default:"" }}</td>
-        <td>{{ pupil.gender }}</td>
-        <td>{{ pupil.birthday|date:'d.m.Y' }}</td>
+        <td>{{ pupil.parent__first_name }}</td>
+        <td>{{ pupil.parent__last_name }}</td>
+        <td>{{ pupil.parent__surname |default:"" }}</td>
+        <td>{{ pupil.parent__phone |default:"" }}</td>
+<!--        <td>{{ pupil.birthday|date:'d.m.Y' }}</td>-->
         </tr>
         {% empty %}
         <tr>
@@ -491,8 +743,8 @@
 </div>
 <script>
 
-function redirectToEditPage(pupilId) {
- window.location.href = `/evika-school/edit-pupil/${pupilId}/`;
+function redirectToEditPage(parentId) {
+ window.location.href = `/evika-school/edit-parent/${parentId}/`;
 
 }
 </script>
@@ -520,7 +772,19 @@ function createNewPupil() {
     console.log("Создание нового ученика");
 }
 
+document.addEventListener("DOMContentLoaded", function () {
+        const birthdayField = document.getElementById("id_birthday");
+        if (birthdayField) {
+            // Устанавливаем атрибуты для поля даты
+            birthdayField.setAttribute("type", "date");
+            birthdayField.setAttribute("placeholder", "гггг-мм-дд");
+            birthdayField.classList.add("form-control");
 
+            // Задаем минимальную и максимальную дату (опционально)
+            const today = new Date().toISOString().split("T")[0];
+            birthdayField.setAttribute("max", today);
+        }
+    });
 
 
 
@@ -544,7 +808,7 @@ function submitForm() {
         notification.style.display = 'block';
         if (data.success) {
             notification.className = 'notification success';
-            notification.innerText = 'Класс успешно сохранён!';
+            notification.innerText = 'Успешно сохранено.';
             setTimeout(() => {
                 window.location.href = data.redirect_url;
             }, 1500);
@@ -559,9 +823,9 @@ function submitForm() {
     });
 }
  function confirmDelete() {
-        if (confirm("Вы уверены, что хотите удалить класс?")) {
+        if (confirm("Вы уверены, что хотите удалить текущего ученика(цы) ?")) {
             const classId = "{{ class_instance.id }}"; // Предполагается, что этот ID доступен в шаблоне
-            fetch(`/evika-school/delete-class/${classId}/`, {
+            fetch(`/evika-school/delete-pupil/${pupilId}/`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': '{{ csrf_token }}'
@@ -569,7 +833,7 @@ function submitForm() {
             })
             .then(response => {
                 if (response.ok) {
-                     window.location.href = "/evika-school/classes/";
+                     window.location.href = "/evika-school/pupils/";
                     return response.json();
                 }
             })
@@ -583,7 +847,7 @@ function showNotification(message, type) {
     notification.innerText = message;
     setTimeout(() => {
         notification.style.display = 'none';
-    }, 3000);
+    }, 2000);
 }
 
 function toggleSelectAll(selectAllCheckbox) {
@@ -605,7 +869,7 @@ function showUnlinkModal() {
         selectedPupils.forEach(id => formData.append('ids[]', id));  // Добавляем каждый ID в formData
 
         // Отправка данных на сервер
-        fetch('/evika-school/unlink-pupils/', {
+        fetch('/evika-school/unlink-parents/', {
             method: 'POST',
             body: formData  // Используем FormData для передачи данных
         })

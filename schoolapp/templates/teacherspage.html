@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Преподователь | EVRIKA SCHOOL</title>
+    <title>Преподователи</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -55,9 +55,17 @@
             padding: 8px;
             text-align: left;
             cursor: pointer;
+            font-weight: 700;
+
         }
         th {
             background: #333;
+        }
+        tr:hover {
+            background-color: #333; /* Более насыщенный серый цвет при наведении */
+            color: #4CAF50;
+
+
         }
         .button-container {
             margin-bottom: 20px;
@@ -70,6 +78,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+
         }
         button:disabled {
             background-color: #555;
@@ -88,7 +97,7 @@
             text-align: center;
             color: white;
             margin-top: 10px;
-            height:300px;
+            height:500px;
         }
         .pagination-container {
             display: flex;
@@ -153,7 +162,7 @@
         <i class="fas fa-sync"></i>
     </button>
     <div class="button-container">
-        <button id="addButton" onclick="addClass()">+ New</button>
+        <button id="addButton" onclick="addPupil()">+ New</button>
         <button id="deleteButton" onclick="deleteClasses()" disabled>Удалить</button>
         <button id="restoreButton" onclick="restoreClasses()" disabled>Восстановить</button>
         <input type="text" id="search" placeholder="Поиск..." value="{{ search_query }}">
@@ -179,7 +188,7 @@
                     <td class="link" onclick="editPupil({{ teacher.id }})">{{ teacher.surname|default:"" }}</td>
 
 
-<!--                </tr>-->
+                </tr>
                     {% endfor %}
         {% else %}
                 <tr>
@@ -225,11 +234,11 @@ function refreshPage() {
 }
 
 function addPupil() {
-    window.location.href = '/evika-school/add-pupil/';
+    window.location.href = '/evika-school/add-teacher/';
 }
 
 function editPupil(id) {
-    window.location.href = `/evika-school/edit-pupil/${id}/`;
+    window.location.href = `/evika-school/edit-teacher/${id}/`;
 }
 
 function toggleAll(source) {
