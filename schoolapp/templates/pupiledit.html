@@ -308,40 +308,65 @@
             color: white;
             border-color: #4CAF50;
         }
-        .form-container {
-        display: flex;
-        justify-content: space-between;
-        gap: 20px; /* Расстояние между колонками */
-    }
-        .form-column {
-        flex: 1; /* Равная ширина колонок */
-    }
+        .form-group input[type="text"],
+        .form-group select,
+        .form-group textarea {
+            width: 480px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .form-group {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            width: 200px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+        }
+        input[type="text"], select, input[type="date"], textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 480px;
+        }
+<!--        .form-container {-->
+<!--        display: flex;-->
+<!--        justify-content: space-between;-->
+<!--        gap: 20px; /* Расстояние между колонками */-->
+<!--    }-->
+<!--        .form-column {-->
+<!--        flex: 1; /* Равная ширина колонок */-->
+<!--    }-->
 
-    .form-group {
-        margin-bottom: 20px; /* Расстояние между полями */
-    }
+<!--    .form-group {-->
+<!--        margin-bottom: 20px; /* Расстояние между полями */-->
+<!--    }-->
 
-    label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
-    }
+<!--    label {-->
+<!--        display: block;-->
+<!--        margin-bottom: 5px;-->
+<!--        font-weight: bold;-->
+<!--    }-->
 
-    input,
-    select {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
+<!--    input,-->
+<!--    select {-->
+<!--        width: 100%;-->
+<!--        padding: 8px;-->
+<!--        border: 1px solid #ccc;-->
+<!--        border-radius: 4px;-->
+<!--    }-->
 
 
-    .error-message {
-        display: none; /* Ошибки изначально скрыты */
-        color: red;
-        font-size: 12px;
-        margin-top: 5px;
-    }
+<!--    .error-message {-->
+<!--        display: none; /* Ошибки изначально скрыты */-->
+<!--        color: red;-->
+<!--        font-size: 12px;-->
+<!--        margin-top: 5px;-->
+<!--    }-->
 
     </style>
 </head>
@@ -407,44 +432,13 @@
             {{ form.isdeleted }}
         </div>
 
-
-<!--        <div class="form-group">-->
-<!--        <label for="id_note">Note</label>-->
-<!--            {{ form.note }}-->
-<!--        </div>-->
-
-<!--        <div class="form-group">-->
-<!--            <label for="id_isdeleted">Is Deleted</label>-->
-<!--            {{ form.isdeleted }}-->
-<!--        </div>-->
-
-
-
-<!--        <div class="form-group">-->
-<!--            <label for="id_classes">Class *</label>-->
-<!--            {{ form.classes }}-->
-<!--            <span class="error-message" id="error_classes" style="display: none; color: red;">Выберите класс.</span>-->
-<!--        </div>-->
-<!--        <div class="form-group">-->
-<!--            <label for="id_isdeleted">Is Deleted</label>-->
-<!--            {{ form.isdeleted }}-->
-<!--        </div>-->
-    </div>
-
-    <!-- Правая колонка -->
-    <div class="form-column">
+            <div class="form-column">
             <div class="form-group">
         <label for="id_note">Note</label>
             {{ form.note }}
         </div>
 
-<!--                <div class="form-group">-->
-<!--            <label for="id_isdeleted">Is Deleted</label>-->
-<!--            {{ form.isdeleted }}-->
-<!--        </div>-->
-
-
-        <div class="form-group">
+                <div class="form-group">
     <label>Создано:</label>
     <input type="text" id="editCreatedBy" value="{{ created_by }}  {{ created_on|date:'d.m.Y  H:i' }}" class="info-field" disabled>
 </div>
@@ -452,167 +446,6 @@
     <label>Изменено:</label>
     <input type="text" id="editModifiedBy" value="{{ modified_by }}  {{ modified_on|date:'d.m.Y  H:i' }}" class="info-field" disabled>
 </div>
-
-
-
-<!--                <div class="form-group">-->
-<!--            <label for="id_classes">Class *</label>-->
-<!--            {{ form.classes }}-->
-<!--            <span class="error-message" id="error_classes" style="display: none; color: red;">Выберите класс.</span>-->
-<!--        </div>-->
-
-<!--        <div class="form-group">-->
-<!--        <label for="id_note">Note</label>-->
-<!--            {{ form.note }}-->
-<!--        </div>-->
-<!--        <div class="form-group">-->
-<!--            <label for="id_isdeleted">Is Deleted</label>-->
-<!--            {{ form.isdeleted }}-->
-<!--        </div>-->
-
-
-
-<!--        <div class="form-group">-->
-<!--            <label for="id_gender">Gender *</label>-->
-<!--            {{ form.gender }}-->
-<!--            <span class="error-message" id="error_gender" style="display: none; color: red;">Пожалуйста, выберите пол.</span>-->
-<!--        </div>-->
-
-<!--        <div class="form-group">-->
-<!--            <label for="id_birthday">Birthday *</label>-->
-<!--            {{ form.birthday }}-->
-<!--        </div>-->
-
-<!--        <div class="form-group">-->
-<!--            <label for="id_classes">Class *</label>-->
-<!--            {{ form.classes }}-->
-<!--            <span class="error-message" id="error_classes" style="display: none; color: red;">Выберите класс.</span>-->
-<!--        </div>-->
-
-<!--        <div class="form-group">-->
-<!--        <label for="id_note">Note</label>-->
-<!--            {{ form.note }}-->
-<!--        </div>-->
-<!--        <div class="form-group">-->
-<!--            <label for="id_isdeleted">Is Deleted</label>-->
-<!--            {{ form.isdeleted }}-->
-<!--        </div>-->
-
-
-
-    </div>
-</div>
-
-<!--<div class="form-group">-->
-<!--    <label for="id_note">Note</label>-->
-<!--    {{ form.note }}-->
-<!--</div>-->
-
-<!--<div class="form-group">-->
-<!--    <label>Создано:</label>-->
-<!--    <input type="text" id="editCreatedBy" value="{{ created_by }}  {{ created_on|date:'d.m.Y  H:i' }}" class="info-field" disabled>-->
-<!--</div>-->
-<!--<div class="form-group">-->
-<!--    <label>Изменено:</label>-->
-<!--    <input type="text" id="editModifiedBy" value="{{ modified_by }}  {{ modified_on|date:'d.m.Y  H:i' }}" class="info-field" disabled>-->
-<!--</div>-->
-
-<!--    <div class="form-container">-->
-<!--    &lt;!&ndash; Левая колонка &ndash;&gt;-->
-<!--    <div class="form-column">-->
-<!--        <div class="form-group">-->
-<!--            <label for="id_first_name">First Name *</label>-->
-<!--            {{ form.first_name }}-->
-<!--            <span class="error-message" id="error_first_name" style="display: none; color: red;">Это поле обязательно.</span>-->
-<!--        </div>-->
-
-<!--        <div class="form-group">-->
-<!--            <label for="id_last_name">Last Name *</label>-->
-<!--            {{ form.last_name }}-->
-<!--            <span class="error-message" id="error_last_name" style="display: none; color: red;">Это поле обязательно.</span>-->
-<!--        </div>-->
-
-<!--        <div class="form-group">-->
-<!--            <label for="id_surname">Surname</label>-->
-<!--            {{ form.surname }}-->
-<!--        </div>-->
-<!--    </div>-->
-
-<!--    &lt;!&ndash; Правая колонка &ndash;&gt;-->
-<!--    <div class="form-column">-->
-<!--        <div class="form-group">-->
-<!--            <label for="id_gender">Gender *</label>-->
-<!--            {{ form.gender }}-->
-<!--            <span class="error-message" id="error_gender" style="display: none; color: red;">Пожалуйста, выберите пол.</span>-->
-<!--        </div>-->
-
-<!--        <div class="form-group">-->
-<!--            <label for="id_birthday">Birthday *</label>-->
-<!--            {{ form.birthday }}-->
-<!--        </div>-->
-
-<!--        <div class="form-group">-->
-<!--            <label for="id_classes">Class *</label>-->
-<!--            {{ form.classes }}-->
-<!--            <span class="error-message" id="error_classes" style="display: none; color: red;">Выберите класс.</span>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
-
-
-<!--        <div class="form-group">-->
-<!--        <label for="id_first_name">First Name *</label>-->
-<!--        {{ form.first_name }}-->
-<!--        <span class="error-message" id="error_first_name" style="display: none; color: red;">Это поле обязательно.</span>-->
-<!--    </div>-->
-
-<!--    <div class="form-group">-->
-<!--        <label for="id_last_name">Last Name *</label>-->
-<!--        {{ form.last_name }}-->
-<!--        <span class="error-message" id="error_last_name" style="display: none; color: red;">Это поле обязательно.</span>-->
-<!--    </div>-->
-
-<!--    <div class="form-group">-->
-<!--        <label for="id_surname">Surname</label>-->
-<!--        {{ form.surname }}-->
-<!--    </div>-->
-
-<!--    <div class="form-group">-->
-<!--        <label for="id_gender">Gender *</label>-->
-<!--        {{ form.gender }}-->
-<!--        <span class="error-message" id="error_gender" style="display: none; color: red;">Пожалуйста, выберите пол.</span>-->
-<!--    </div>-->
-
-<!--    <div class="form-group">-->
-<!--        <label for="id_birthday">Birthday *</label>-->
-<!--        {{ form.birthday }}-->
-<!--    </div>-->
-
-<!--    <div class="form-group">-->
-<!--        <label for="id_classes">Class *</label>-->
-<!--        {{ form.classes }}-->
-<!--        <span class="error-message" id="error_classes" style="display: none; color: red;">Выберите класс.</span>-->
-<!--    </div>-->
-
-<!--    <div class="form-group">-->
-<!--        <label for="id_isdeleted">Is Deleted </label>-->
-<!--        {{ form.isdeleted }}-->
-<!--    </div>-->
-
-<!--    <div class="form-group">-->
-<!--        <label for="id_note">Note</label>-->
-<!--        {{ form.note }}-->
-<!--    </div>-->
-<!--</form>-->
-<!--    <div class="form-group">-->
-<!--        <label>Создано:</label>-->
-<!--        <input type="text" id="editCreatedBy" value="{{ created_by }}  {{ created_on|date:' d.m.Y  H:i' }}" class="info-field" disabled>-->
-<!--    </div>-->
-<!--    <div class="form-group">-->
-<!--        <label>Изменено:</label>-->
-<!--        <input type="text" id="editModifiedBy" value="{{ modified_by }}  {{ modified_on|date:'d.m.Y  H:i' }}" class="info-field" disabled>-->
-<!--    </div>-->
-<!--</form>-->
 
 <center><h3>Родители текущего ученика(цы)</h3></center>
 <div class="action-buttons">
