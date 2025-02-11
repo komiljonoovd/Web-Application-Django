@@ -24,7 +24,9 @@ SECRET_KEY = 'django-insecure-nj0ujn_lx&(3+z2t^wft(m&0v&#n359#yy0v&nuoatpb4#%cmh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost',
+                 '127.0.0.1',
+                 ]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -120,5 +122,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/evika-school/login/'
 LOGOUT_URL = '/evika-school/logout/'
-SESSION_COOKIE_AGE = 10800
+SESSION_COOKIE_AGE = 3600*9
 APPEND_SLASH = True
