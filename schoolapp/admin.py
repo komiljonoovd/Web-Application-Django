@@ -1,7 +1,6 @@
 from django.contrib import admin
 from .models import (
-    Classes, Gender,
-    Payment, Parents, Pupils, Teachers, ParentPupil)
+    Classes, Parents, Pupils, Teachers, ParentPupil)
 
 
 @admin.register(Classes)
@@ -13,27 +12,6 @@ class ClassDepartmentAdmin(admin.ModelAdmin):
     list_display_links = ['id', 'number', 'letter']
     list_per_page = 30
     ordering = ['id']
-
-
-@admin.register(Gender)
-class GenderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'type', 'createdon',
-                    'modifiedon', 'createdby', 'modifiedby', 'isdeleted']
-
-    list_display_links = ['id', 'type']
-    ordering = ['id']
-    list_per_page = 30
-
-
-
-@admin.register(Payment)
-class PaymentAdmin(admin.ModelAdmin):
-    list_display = ['id', 'type', 'createdon',
-                    'modifiedon', 'createdby', 'modifiedby', 'isdeleted']
-    list_display_links = ['id', 'type']
-    list_per_page = 30
-    ordering = ['id']
-
 
 @admin.register(Parents)
 class ParentsAdmin(admin.ModelAdmin):
