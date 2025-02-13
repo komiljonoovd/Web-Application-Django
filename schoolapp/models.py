@@ -21,48 +21,6 @@ class Classes(models.Model):
         verbose_name_plural = 'Classes'
 
 
-class Gender(models.Model):
-    type = models.CharField(max_length=128)
-    createdon = models.DateTimeField(auto_now_add=True)
-    modifiedon = models.DateTimeField(auto_now=True)
-    createdby = models.CharField(max_length=128)
-    modifiedby = models.CharField(max_length=128, blank=True)
-    isdeleted = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.type
-
-    # def clean(self):
-    #     if self.pk and not self.modifiedby:
-    #         raise ValidationError({'modifiedby': 'This field is required.'})
-
-    class Meta:
-        db_table = 'Gender'
-        verbose_name = 'Gender'
-        verbose_name_plural = 'Gender'
-
-
-class Payment(models.Model):
-    type = models.CharField(max_length=128)
-    createdon = models.DateTimeField(auto_now_add=True)
-    modifiedon = models.DateTimeField(auto_now=True)
-    createdby = models.CharField(max_length=128)
-    modifiedby = models.CharField(max_length=128, blank=True)
-    isdeleted = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.type
-
-    # def clean(self):
-    #     if self.pk and not self.modifiedby:
-    #         raise ValidationError({'modifiedby': 'This field is required.'})
-
-    class Meta:
-        db_table = 'Payment'
-        verbose_name = 'Payment'
-        verbose_name_plural = 'Payment'
-
-
 class Parents(models.Model):
     first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
