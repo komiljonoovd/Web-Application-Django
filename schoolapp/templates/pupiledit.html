@@ -382,13 +382,13 @@
     </div>
 </div>
 
-<center><h2>Редактирование  <i class="fas fa-edit"></i></h2></center>
+<center><h2>Редактирование ученика(цы) <i class="fas fa-edit"></i></h2></center>
 
 <div id="notification" class="notification"></div>
 
 <form id="editClassForm" method="post" action="{% url 'edit_pupils' pupils_instance.id %}">
     {% csrf_token %}
-    <input type="hidden" id="classIdInput" value="{{ pupils_instance.id }}">
+    <input type="hidden" id="childId" value="{{ pupils_instance.id }}">
 
     <div class="form-container">
     <!-- Левая колонка -->
@@ -657,8 +657,8 @@ function submitForm() {
 }
  function confirmDelete() {
         if (confirm("Вы уверены, что хотите удалить текущего ученика(цы) ?")) {
-            const classId = "{{ class_instance.id }}"; // Предполагается, что этот ID доступен в шаблоне
-            fetch(`/evika-school/delete-pupil/${pupilId}/`, {
+            const pupilId = "{{ class_instance.id }}"; // Предполагается, что этот ID доступен в шаблоне
+            fetch(`/evika-school/delete-pupil/${childId}/`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': '{{ csrf_token }}'
@@ -691,20 +691,25 @@ function toggleSelectAll(selectAllCheckbox) {
     toggleButtonStates();
 }
 
-// Обработчик для кнопки Unlink
 function showUnlinkModal() {
     const selectedPupils = Array.from(document.querySelectorAll('input.pupil-checkbox:checked'))
                                 .map(checkbox => checkbox.value);
 
     if (selectedPupils.length > 0) {
+        // Получаем ID родителя
+        const childId = document.getElementById('childId').value;
+
         // Создаем объект FormData для передачи ID учеников
         const formData = new FormData();
         selectedPupils.forEach(id => formData.append('ids[]', id));  // Добавляем каждый ID в formData
 
         // Отправка данных на сервер
-        fetch('/evika-school/unlink-parents/', {
+        fetch(`/evika-school/unlink-parents/${childId}/`, {
             method: 'POST',
-            body: formData  // Используем FormData для передачи данных
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ ids: selectedPupils })
         })
         .then(response => {
             if (response.ok) {
@@ -715,13 +720,13 @@ function showUnlinkModal() {
         })
         .then(data => {
             location.reload();  // Обновить страницу
-<!--            alert();  // Показать сообщение об успехе-->
         })
         .catch(error => console.error('Ошибка запроса:', error));
     } else {
         alert('Выберите хотя бы одного ученика.');
     }
 }
+
 
 
 
@@ -732,7 +737,7 @@ function deleteSelectedPupils() {
     Array.from(document.querySelectorAll('input.pupil-checkbox:checked'))
                                  .map(checkbox => checkbox.value);
     if (selectedPupils.length > 0) {
-        fetch('/evika-school/delete-pupils/', {
+        fetch('/evika-school/delete-parents/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -795,27 +800,90 @@ function toggleButtonStates() {
     document.getElementById('restoreButton').disabled = !anyChecked;
 }
 
+<!--function fetchPupils(page = 1) {-->
+<!--    const searchQuery = document.getElementById('searchInput').value.trim();-->
+<!--    const rowsPerPage = document.getElementById('rowsPerPage')-->
+<!--        ? document.getElementById('rowsPerPage').value-->
+<!--        : 10; // Значение по умолчанию, если `rowsPerPage` отсутствует-->
+
+<!--        const url = `/evika-school/not-linked-parents/${childId}/?search=${encodeURIComponent(searchQuery)}&rows_per_page=${rowsPerPage}&page=${page}`;-->
+
+<!--    fetch(url)-->
+<!--        .then(response => {-->
+<!--            if (!response.ok) {-->
+<!--                throw new Error(`Ошибка HTTP: ${response.status}`);-->
+<!--            }-->
+<!--            return response.json();-->
+<!--        })-->
+<!--        .then(data => {-->
+<!--            if (!data || !data.pupils || !data.pagination) {-->
+<!--                throw new Error('Некорректный формат данных от сервера.');-->
+<!--            }-->
+
+<!--            // Обновление таблицы учеников-->
+<!--            const tbody = document.getElementById('pupilTableBody');-->
+<!--            tbody.innerHTML = '';-->
+
+<!--            if (data.pupils.length > 0) {-->
+<!--                data.pupils.forEach(pupil => {-->
+<!--                    const fullName = `${pupil.first_name} ${pupil.last_name} ${pupil.surname || ''}`;-->
+<!--                    const row = document.createElement('tr');-->
+<!--                    row.innerHTML = `-->
+<!--                        <td><input type="checkbox" id="${pupil.id}" value="${pupil.id}" name="selectPupil"></td>-->
+<!--                        <td>${fullName}</td>-->
+<!--                    `;-->
+<!--                    tbody.appendChild(row);-->
+<!--                });-->
+<!--            } else {-->
+<!--                tbody.innerHTML = `-->
+<!--                    <tr>-->
+<!--                        <td colspan="2" class="no-data">-->
+<!--                            <center>NO DATA TO DISPLAY</center>-->
+<!--                        </td>-->
+<!--                    </tr>`;-->
+<!--            }-->
+
+<!--            // Обновление пагинации-->
+<!--            const paginationLinks = document.getElementById('paginationLinks');-->
+<!--            paginationLinks.innerHTML = '';-->
+
+<!--            for (let i = 1; i <= data.pagination.num_pages; i++) {-->
+<!--                const pageButton = document.createElement('button');-->
+<!--                pageButton.classList.add('pagination-button');-->
+<!--                if (i === data.pagination.current_page) {-->
+<!--                    pageButton.classList.add('active');-->
+<!--                }-->
+<!--                pageButton.innerText = i;-->
+<!--                pageButton.onclick = () => fetchPupils(i);-->
+<!--                paginationLinks.appendChild(pageButton);-->
+<!--            }-->
+<!--        })-->
+<!--        .catch(error => console.error('Ошибка загрузки данных:', error));-->
+<!--}-->
+
+
 function fetchPupils(page = 1) {
     const searchQuery = document.getElementById('searchInput').value.trim();
     const rowsPerPage = document.getElementById('rowsPerPage')
         ? document.getElementById('rowsPerPage').value
-        : 10; // Значение по умолчанию, если `rowsPerPage` отсутствует
+        : 10; // Default value if `rowsPerPage` is missing
 
-    const url = `/evika-school/not-linked-pupils/?search=${encodeURIComponent(searchQuery)}&rows_per_page=${rowsPerPage}&page=${page}`;
+    const childId = document.getElementById('childId').value; // Assuming you have a hidden input or similar to get the childId
+    const url = `/evika-school/not-linked-parents/${childId}/?search=${encodeURIComponent(searchQuery)}&rows_per_page=${rowsPerPage}&page=${page}`;
 
     fetch(url)
         .then(response => {
             if (!response.ok) {
-                throw new Error(`Ошибка HTTP: ${response.status}`);
+                throw new Error(`HTTP error: ${response.status}`);
             }
             return response.json();
         })
         .then(data => {
             if (!data || !data.pupils || !data.pagination) {
-                throw new Error('Некорректный формат данных от сервера.');
+                throw new Error('Invalid data format from server.');
             }
 
-            // Обновление таблицы учеников
+            // Update the pupils table
             const tbody = document.getElementById('pupilTableBody');
             tbody.innerHTML = '';
 
@@ -838,7 +906,7 @@ function fetchPupils(page = 1) {
                     </tr>`;
             }
 
-            // Обновление пагинации
+            // Update pagination
             const paginationLinks = document.getElementById('paginationLinks');
             paginationLinks.innerHTML = '';
 
@@ -853,9 +921,8 @@ function fetchPupils(page = 1) {
                 paginationLinks.appendChild(pageButton);
             }
         })
-        .catch(error => console.error('Ошибка загрузки данных:', error));
+        .catch(error => console.error('Data loading error:', error));
 }
-
 // Функция для изменения страницы
 function changePage(page) {
     document.getElementById('currentPage').value = page;
@@ -916,16 +983,17 @@ function getSelectedPupilIds() {
 }
 
 
+
 function linkSelectedPupils() {
     const selectedPupils = getSelectedPupilIds();
-    const classId = document.getElementById('classIdInput').value; // Получаем ID класса
+    const childId = document.getElementById('childId').value; // Получаем ID класса
 
     if (selectedPupils.length === 0) {
         alert('Выберите хотя бы одного ученика для привязки.');
         return;
     }
 
-    fetch(`/evika-school/link-pupils/${classId}/`, {
+    fetch(`/evika-school/link-parents/${childId}/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -949,16 +1017,16 @@ function linkSelectedPupils() {
 
 function getClassId() {
     // Получение ID текущего класса (например, из скрытого поля)
-    return document.getElementById('classId').value;
+    return document.getElementById('childId').value;
 }
 
 document.querySelectorAll('#pupilTableBody input[name="selectPupil"]').forEach(checkbox => {
     checkbox.addEventListener('change', (e) => {
-        const pupilId = e.target.value;
+        const childId = e.target.value;
         if (e.target.checked) {
-            selectedPupils.add(pupilId);
+            selectedPupils.add(childId);
         } else {
-            selectedPupils.delete(pupilId);
+            selectedPupils.delete(childId);
         }
         toggleLinkButton();
     });
