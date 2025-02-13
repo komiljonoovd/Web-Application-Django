@@ -6,7 +6,7 @@ from django.utils import timezone
 from schoolapp.models import Classes, ParentPupil
 from django.shortcuts import render, redirect
 from django.utils import timezone
-from .models import Classes, Pupils, Teachers, Gender, Payment, Parents
+from .models import Classes, Pupils, Teachers,Parents
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .forms import ClassForm, PupilForm, ParentForm, TeacherForm
@@ -22,7 +22,6 @@ def class_list(request):
     search_query = request.GET.get('search', '')
     rows_per_page = request.GET.get('rows_per_page', '20')
 
-    # Преобразование rows_per_page в число
     try:
         rows_per_page = int(rows_per_page)
         if rows_per_page <= 0:
@@ -483,100 +482,9 @@ def delete_teachers_list(request):
     return JsonResponse({'message': 'Ошибка при удалении Родителей.'})
 
 
-@login_required
-def payment_list(request):
-    search_query = request.GET.get('search', '')
-    rows_per_page = request.GET.get('rows_per_page', '20')
-
-    try:
-        rows_per_page = int(rows_per_page)
-        if rows_per_page <= 0:
-            rows_per_page = 20
-    except ValueError:
-        rows_per_page = 20
-
-    payment = Payment.objects.all().order_by('type')
-    if search_query:
-        payment = payment.filter(type__icontains=search_query.capitalize())
-
-    paginator = Paginator(payment, rows_per_page)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    context = {
-        'page_obj': page_obj,
-        'search_query': search_query,
-        'rows_per_page': rows_per_page,
-    }
-    return render(request, 'paymentpage.html', context)
 
 
-@csrf_exempt
-def restore_payment_list(request):
-    if request.method == 'POST':
-        ids = request.POST.getlist('ids[]')
-        ids = [int(i) for i in ids[0].split(',')]
-        Payment.objects.filter(id__in=ids).update(isdeleted=False)
-        return JsonResponse({'message': 'Успешно восстановлено.'})
-    return JsonResponse({'message': 'Ошибка при восстановлении Тип оплаты.'})
 
-
-@csrf_exempt
-def delete_payment_list(request):
-    if request.method == 'POST':
-        ids = request.POST.getlist('ids[]')
-        ids = [int(i) for i in ids[0].split(',')]
-        Payment.objects.filter(id__in=ids).update(isdeleted=True)
-        return JsonResponse({'message': 'Успешно удалено.'})
-    return JsonResponse({'message': 'Ошибка при удалении Тип оплаты.'})
-
-
-@login_required
-def gender_list(request):
-    search_query = request.GET.get('search', '')
-    rows_per_page = request.GET.get('rows_per_page', '20')
-
-    try:
-        rows_per_page = int(rows_per_page)
-        if rows_per_page <= 0:
-            rows_per_page = 20
-    except ValueError:
-        rows_per_page = 20
-
-    gender = Gender.objects.all().order_by('-type')
-    if search_query:
-        gender = gender.filter(type__icontains=search_query.capitalize())
-
-    paginator = Paginator(gender, rows_per_page)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    context = {
-        'page_obj': page_obj,
-        'search_query': search_query,
-        'rows_per_page': rows_per_page,
-    }
-    return render(request, 'genderpage.html', context)
-
-
-@csrf_exempt
-def restore_gender_list(request):
-    if request.method == 'POST':
-        ids = request.POST.getlist('ids[]')
-        ids = [int(i) for i in ids[0].split(',')]
-        Payment.objects.filter(id__in=ids).update(isdeleted=False)
-        return JsonResponse({'message': 'Успешно восстановлено.'})
-    return JsonResponse({'message': 'Ошибка при восстановлении Тип оплаты.'})
-
-
-@csrf_exempt
-def delete_gender_list(request):
-    if request.method == 'POST':
-        ids = request.POST.getlist('ids[]')
-        ids = [int(i) for i in ids[0].split(',')]
-        Payment.objects.filter(id__in=ids).update(isdeleted=True)
-        return JsonResponse({'message': 'Успешно удалено.'})
-    return JsonResponse({'message': 'Ошибка при удалении Тип оплаты.'})
 
 
 @csrf_exempt
@@ -585,10 +493,10 @@ def not_linked_pupils(request):
     rows_per_page = int(request.GET.get('rows_per_page', 10))
     search_query = request.GET.get('search', '').strip()
 
-    pupil = Pupils.objects.filter(classes=None, isdeleted=False).order_by('last_name')
+    pupil = Pupils.objects.filter(classes__isnull=True, isdeleted=False).order_by('last_name')
 
     if search_query:
-        pupil = pupil.filter(first_name__iexact=search_query.capitalize()
+        pupil = pupil.filter(first_name__icontains=search_query.capitalize()
                                                 | pupil.filter(last_name__icontains=search_query.capitalize())
                                                 | pupil.filter(surname__icontains=search_query.capitalize())
                              )
@@ -731,7 +639,7 @@ def edit_pupils(request, pk):
 
     # Пагинация списка родителей
     parent_list = ParentPupil.objects.filter(pupil=pk).values('parent__id', 'parent__first_name', 'parent__last_name',
-                                                              'parent__surname', 'parent__phone')
+                                                              'parent__surname', 'parent__phone').order_by('parent__last_name')
 
     page_number = request.GET.get('page', 1)
     rows_per_page = request.GET.get('rows_per_page', 10)
@@ -802,7 +710,7 @@ def edit_parents(request, pk):
         'pupil__classes__teacher__first_name',
         'pupil__classes__teacher__last_name',
         'pupil__classes__teacher__surname'
-    )
+    ).order_by('pupil__first_name')
 
     page_number = request.GET.get('page', 1)
     rows_per_page = request.GET.get('rows_per_page', 10)
@@ -871,7 +779,7 @@ def edit_teachers(request, pk):
     form = TeacherForm(instance=teacher)
 
     classes_list = Classes.objects.filter(teacher=pk).order_by('-number', '-isactive').values('id', 'number', 'letter',
-                                                                                             'isactive')
+                                                                                             'isactive').order_by('-number')
 
     page_number = request.GET.get('page', 1)
     rows_per_page = request.GET.get('rows_per_page', 10)
@@ -903,3 +811,232 @@ def edit_teachers(request, pk):
         'page_obj': page_obj,
         'rows_per_page': rows_per_page,
     })
+
+#
+# @csrf_exempt
+# def not_linked_classes(request):
+#     page = int(request.GET.get('page', 1))
+#     rows_per_page = int(request.GET.get('rows_per_page', 10))
+#     search_query = request.GET.get('search', '').strip()
+#
+#     cls = Classes.objects.filter(teacher__isnull=True,isactive=True,isdeleted=False).order_by('-number')
+#
+#     if search_query:
+#         cls = Classes.filter(first_name__icontains=search_query.capitalize()
+#                                                    | cls.filter(last_name__icontains=search_query.capitalize())
+#                                                    | cls.filter(surname__icontains=search_query.capitalize())
+#                              )
+#
+#     paginator = Paginator(cls, rows_per_page)
+#     paginated_pupils = paginator.get_page(page)
+#
+#     data = {
+#         'cls': [
+#             {
+#                 'id': cls.id,
+#                 'number': cls.number,
+#                 'letter': cls.letter,
+#             }
+#             for cls in paginated_pupils
+#         ],
+#         'pagination': {
+#             'num_pages': paginator.num_pages,
+#             'current_page': paginated_pupils.number,
+#         }
+#     }
+#
+#     return JsonResponse(data)
+
+@csrf_exempt
+def not_linked_classes(request):
+    page = int(request.GET.get('page', 1))
+    rows_per_page = int(request.GET.get('rows_per_page', 10))
+    search_query = request.GET.get('search', '').strip()
+
+    pupil = Classes.objects.filter(teacher__isnull=True,isactive=True,isdeleted=False).order_by('-number')
+
+    if search_query:
+        try:
+            search_number = int(search_query)
+            pupil = pupil.filter(number__iexact=search_number)
+        except ValueError:
+            pupil = pupil.filter(letter__iexact=search_query.capitalize())
+
+    paginator = Paginator(pupil, rows_per_page)
+    paginated_pupils = paginator.get_page(page)
+
+    data = {
+        'pupils': [
+            {
+                'id': pupil.id,
+                'number': pupil.number,
+                'letter': pupil.letter,
+            }
+            for pupil in paginated_pupils
+        ],
+        'pagination': {
+            'num_pages': paginator.num_pages,
+            'current_page': paginated_pupils.number,
+        }
+    }
+
+    return JsonResponse(data)
+
+
+@csrf_exempt
+def unlink_classes(request):
+    if request.method == 'POST':
+        ids = request.POST.getlist('ids[]')
+        ids = [int(i) for i in ids]
+        Classes.objects.filter(id__in=ids).update(teacher=None)
+        return JsonResponse({'message': 'Успешно удалено.'})
+    return JsonResponse({'error': 'Ошибка при архивировании классов.'}, status=400)
+
+
+@csrf_exempt
+def link_classes(request,teacher_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        pupil_ids = data.get('ids', [])
+        Classes.objects.filter(id__in=pupil_ids).update(teacher=teacher_id)
+        print(pupil_ids)
+        print(teacher_id)
+
+        return JsonResponse({'success': 'Привязано успешно.'})
+    return JsonResponse({'success': 'Ошибка при привязании.'})
+
+
+@csrf_exempt
+def not_linked_child(request,parent_id):
+    if request.method == 'GET':
+        page = int(request.GET.get('page', 1))
+        rows_per_page = int(request.GET.get('rows_per_page', 10))
+        search_query = request.GET.get('search', '').strip()
+
+        exclude_pupils=ParentPupil.objects.filter(parent=parent_id).values('pupil')
+        not_linked = Pupils.objects.filter(isdeleted=False).exclude(id__in=exclude_pupils).order_by('last_name')
+
+        if search_query:
+            not_linked = not_linked.filter(first_name__icontains=search_query.capitalize()
+                                                       | not_linked.filter(last_name__icontains=search_query.capitalize())
+                                                       | not_linked.filter(surname__icontains=search_query.capitalize())
+                                 )
+
+        paginator = Paginator(not_linked, rows_per_page)
+        paginated_pupils = paginator.get_page(page)
+
+        data = {
+            'pupils': [
+                {
+                    'id': pupil.id,
+                    'first_name': pupil.first_name,
+                    'last_name': pupil.last_name,
+                    'surname': pupil.surname,
+                }
+                for pupil in paginated_pupils
+            ],
+            'pagination': {
+                'num_pages': paginator.num_pages,
+                'current_page': paginated_pupils.number,
+            }
+        }
+
+        return JsonResponse(data)
+
+
+
+@csrf_exempt
+def not_linked_parent(request,child_id):
+    if request.method == 'GET':
+        page = int(request.GET.get('page', 1))
+        rows_per_page = int(request.GET.get('rows_per_page', 10))
+        search_query = request.GET.get('search', '').strip()
+
+        exclude_parents=ParentPupil.objects.filter(pupil=child_id).values('parent')
+        not_linked = Parents.objects.filter(isdeleted=False).exclude(id__in=exclude_parents).order_by('first_name')
+
+        if search_query:
+            not_linked = not_linked.filter(first_name__icontains=search_query.capitalize()
+                                                       | not_linked.filter(last_name__icontains=search_query.capitalize())
+                                                       | not_linked.filter(surname__icontains=search_query.capitalize())
+
+                                           )
+        paginator = Paginator(not_linked, rows_per_page)
+        paginated_pupils = paginator.get_page(page)
+
+        data = {
+            'pupils': [
+                {
+                    'id': pupil.id,
+                    'first_name': pupil.first_name,
+                    'last_name': pupil.last_name,
+                    'surname': pupil.surname,
+                }
+                for pupil in paginated_pupils
+            ],
+            'pagination': {
+                'num_pages': paginator.num_pages,
+                'current_page': paginated_pupils.number,
+            }
+        }
+
+        return JsonResponse(data)
+
+
+@csrf_exempt
+def link_parents(request,child_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        parent_ids = data.get('ids', [])
+        parent_ids=[int(parent) for parent in parent_ids]
+        print(parent_ids)
+
+        child = Pupils.objects.get(pk=child_id)
+        for parent in parent_ids:
+            parent = Parents.objects.get(pk=parent)
+            ParentPupil.objects.create(parent=parent,pupil=child)
+
+        return JsonResponse({'success': 'Привязано успешно.'})
+    return JsonResponse({'success': 'Ошибка при привязании.'})
+
+
+@csrf_exempt
+def link_childs(request, parent_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        child_ids = data.get('ids', [])
+        child_ids=[int(childs) for childs in child_ids]
+
+        parent = Parents.objects.get(id=parent_id)
+        for child_id in child_ids:
+            child = Pupils.objects.get(id=child_id)
+            ParentPupil.objects.create(pupil=child, parent=parent)
+
+        return JsonResponse({'success': 'Привязано успешно.'})
+    return JsonResponse({'success': 'Ошибка при привязании.'})
+
+@csrf_exempt
+def unlink_childs(request, parent_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        child_ids = data.get('ids', [])
+        child_ids = [int(childs) for childs in child_ids]
+
+        parent = Parents.objects.get(id=parent_id)
+        ParentPupil.objects.filter(parent=parent, pupil__in=child_ids).delete()
+
+        return JsonResponse({'success': 'Успешно отвязано.'})
+    return JsonResponse({'success': 'Ошибка при отвязывании.'})
+
+@csrf_exempt
+def unlink_parents(request, child_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        parent_ids = data.get('ids', [])
+        parent_ids = [int(parent) for parent in parent_ids]
+
+        child = Pupils.objects.get(id=child_id)
+        ParentPupil.objects.filter(pupil=child, parent__in=parent_ids).delete()
+
+        return JsonResponse({'success': 'Успешно отвязано.'})
+    return JsonResponse({'success': 'Ошибка при отвязывании.'})
