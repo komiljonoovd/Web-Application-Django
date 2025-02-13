@@ -401,7 +401,7 @@
             <thead>
                 <tr>
                     <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
-                    <th><center>Full Name</center></th>
+                    <th><center>Класс</center></th>
                 </tr>
             </thead>
             <tbody id="pupilTableBody">
@@ -611,7 +611,7 @@ function showUnlinkModal() {
         selectedPupils.forEach(id => formData.append('ids[]', id));  // Добавляем каждый ID в formData
 
         // Отправка данных на сервер
-        fetch('/evika-school/unlink-pupils/', {
+        fetch('/evika-school/unlink-classes/', {
             method: 'POST',
             body: formData  // Используем FormData для передачи данных
         })
@@ -641,7 +641,7 @@ function deleteSelectedPupils() {
     Array.from(document.querySelectorAll('input.pupil-checkbox:checked'))
                                  .map(checkbox => checkbox.value);
     if (selectedPupils.length > 0) {
-        fetch('/evika-school/delete-pupils/', {
+        fetch('/evika-school/delete-classes/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -666,7 +666,7 @@ function restoreSelectedPupils() {
     Array.from(document.querySelectorAll('input.pupil-checkbox:checked'))
                                  .map(checkbox => checkbox.value);
     if (selectedPupils.length > 0) {
-        fetch('/evika-school/restore-pupils/', {
+        fetch('/evika-school/restore-classes/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -710,7 +710,7 @@ function fetchPupils(page = 1) {
         ? document.getElementById('rowsPerPage').value
         : 10; // Значение по умолчанию, если `rowsPerPage` отсутствует
 
-    const url = `/evika-school/not-linked-pupils/?search=${encodeURIComponent(searchQuery)}&rows_per_page=${rowsPerPage}&page=${page}`;
+    const url = `/evika-school/not-linked-classes/?search=${encodeURIComponent(searchQuery)}&rows_per_page=${rowsPerPage}&page=${page}`;
 
     fetch(url)
         .then(response => {
@@ -730,7 +730,7 @@ function fetchPupils(page = 1) {
 
             if (data.pupils.length > 0) {
                 data.pupils.forEach(pupil => {
-                    const fullName = `${pupil.first_name} ${pupil.last_name} ${pupil.surname || ''}`;
+                    const fullName = `${pupil.number} - ${pupil.letter}`;
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td><input type="checkbox" id="${pupil.id}" value="${pupil.id}" name="selectPupil"></td>
@@ -834,7 +834,7 @@ function linkSelectedPupils() {
         return;
     }
 
-    fetch(`/evika-school/link-pupils/${classId}/`, {
+    fetch(`/evika-school/link-classes/${classId}/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
