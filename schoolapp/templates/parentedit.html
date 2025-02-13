@@ -330,7 +330,7 @@
 
 <form id="editClassForm" method="post" action="{% url 'edit_parent' pupils_instance.id %}">
     {% csrf_token %}
-    <input type="hidden" id="classIdInput" value="{{ pupils_instance.id }}">
+    <input type="hidden" id="parentId" value="{{ pupils_instance.id }}">
 
      <div class="form-group">
         <label for="id_first_name">First Name *</label>
@@ -609,19 +609,56 @@ function toggleSelectAll(selectAllCheckbox) {
 }
 
 // Обработчик для кнопки Unlink
+<!--function showUnlinkModal() {-->
+<!--    const selectedPupils = Array.from(document.querySelectorAll('input.pupil-checkbox:checked'))-->
+<!--                                .map(checkbox => checkbox.value);-->
+
+<!--    if (selectedPupils.length > 0) {-->
+<!--        // Создаем объект FormData для передачи ID учеников-->
+<!--        const formData = new FormData();-->
+<!--        selectedPupils.forEach(id => formData.append('ids[]', id));  // Добавляем каждый ID в formData-->
+
+<!--        // Отправка данных на сервер-->
+<!--        fetch('/evika-school/unlink-pupils/', {-->
+<!--            method: 'POST',-->
+<!--            body: formData  // Используем FormData для передачи данных-->
+<!--        })-->
+<!--        .then(response => {-->
+<!--            if (response.ok) {-->
+<!--                return response.json();  // Обработка ответа от сервера-->
+<!--            } else {-->
+<!--                throw new Error('Ошибка при отвязывании учеников.');-->
+<!--            }-->
+<!--        })-->
+<!--        .then(data => {-->
+<!--            location.reload();  // Обновить страницу-->
+<!--&lt;!&ndash;            alert();  // Показать сообщение об успехе&ndash;&gt;-->
+<!--        })-->
+<!--        .catch(error => console.error('Ошибка запроса:', error));-->
+<!--    } else {-->
+<!--        alert('Выберите хотя бы одного ученика.');-->
+<!--    }-->
+<!--}-->
+
 function showUnlinkModal() {
     const selectedPupils = Array.from(document.querySelectorAll('input.pupil-checkbox:checked'))
                                 .map(checkbox => checkbox.value);
 
     if (selectedPupils.length > 0) {
+        // Получаем ID родителя
+        const parentId = document.getElementById('parentId').value;
+
         // Создаем объект FormData для передачи ID учеников
         const formData = new FormData();
         selectedPupils.forEach(id => formData.append('ids[]', id));  // Добавляем каждый ID в formData
 
         // Отправка данных на сервер
-        fetch('/evika-school/unlink-pupils/', {
+        fetch(`/evika-school/unlink-childs/${parentId}/`, {
             method: 'POST',
-            body: formData  // Используем FormData для передачи данных
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ ids: selectedPupils })
         })
         .then(response => {
             if (response.ok) {
@@ -632,15 +669,12 @@ function showUnlinkModal() {
         })
         .then(data => {
             location.reload();  // Обновить страницу
-<!--            alert();  // Показать сообщение об успехе-->
         })
         .catch(error => console.error('Ошибка запроса:', error));
     } else {
         alert('Выберите хотя бы одного ученика.');
     }
 }
-
-
 
 // Обработчик для кнопки Удалить
 
@@ -718,7 +752,8 @@ function fetchPupils(page = 1) {
         ? document.getElementById('rowsPerPage').value
         : 10; // Значение по умолчанию, если `rowsPerPage` отсутствует
 
-    const url = `/evika-school/not-linked-pupils/?search=${encodeURIComponent(searchQuery)}&rows_per_page=${rowsPerPage}&page=${page}`;
+    const parentId = document.getElementById('parentId').value; // Assuming you have a hidden input or similar to get the childId
+    const url = `/evika-school/not-linked-child/${parentId}/?search=${encodeURIComponent(searchQuery)}&rows_per_page=${rowsPerPage}&page=${page}`;
 
     fetch(url)
         .then(response => {
@@ -835,14 +870,14 @@ function getSelectedPupilIds() {
 
 function linkSelectedPupils() {
     const selectedPupils = getSelectedPupilIds();
-    const classId = document.getElementById('classIdInput').value; // Получаем ID класса
+    const parentId = document.getElementById('parentId').value; // Получаем ID класса
 
     if (selectedPupils.length === 0) {
         alert('Выберите хотя бы одного ученика для привязки.');
         return;
     }
 
-    fetch(`/evika-school/link-pupils/${classId}/`, {
+    fetch(`/evika-school/link-child/${parentId}/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
