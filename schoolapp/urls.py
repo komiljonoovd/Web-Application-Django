@@ -22,9 +22,11 @@ urlpatterns = [
     path('link-pupils/<int:class_id>/', views.link_pupils, name='link-pupils'),
     path('not-linked-pupils/', views.not_linked_pupils, name='not-linked-pupils'),
     path('link-child/<int:parent_id>/',views.link_childs,name='link-childs'),
+    path('delete-pupil/<int:pk>/', views.delete_pupil, name='delete_pupil'),
 
     path('add-pupil/', views.add_pupil, name='add_pupil'),
     path('pupils/', views.pupil_list, name='pupils-list'),
+    path('delete-pupil/<int:pupil_id>/', views.delete_pupil, name='delete_pupil'),
     path('edit-pupil/<int:pk>/', views.edit_pupils, name='edit_pupils'),
     path('delete-pupils/', views.delete_pupils_list, name='delete-pupils-list'),
     path('restore-pupils', views.restore_pupils_list, name='restore-pupils-list'),
@@ -33,6 +35,7 @@ urlpatterns = [
 
     path('parents/', views.parent_list, name='parent-list'),
     path('edit-parent/<int:pk>/',views.edit_parents,name='edit_parent'),
+    path('delete-parent/<int:parent_id>/', views.delete_parent, name='delete_parent'),
     path('add-parent/', views.add_parent, name='add_parent'),
     path('delete-parents/', views.delete_parents_list, name='delete-parents-list'),
     path('restore-parents/', views.restore_parents_list, name='restore-parents-list'),
@@ -45,6 +48,7 @@ urlpatterns = [
     path('add-teacher/', views.add_teacher, name='add_teacher'),
     path('delete-teachers/', views.delete_teachers_list, name='delete_teachers_list'),
     path('restore-teachers/', views.restore_teachers_list, name='restore_teachers_list'),
+    path('delete-teacher/<int:teacher_id>/', views.delete_teacher, name='delete_teacher'),
 
 
 

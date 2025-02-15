@@ -253,13 +253,8 @@ def archive_classes(request):
 @csrf_exempt
 def delete_class(request, class_id):
     if request.method == 'POST':
-        try:
-            class_instance = Classes.objects.get(id=class_id)
-            class_instance.isdeleted = True
-            class_instance.save()
-            return JsonResponse({'message': 'Класс успешно удалён.'})
-        except Classes.DoesNotExist:
-            return JsonResponse({'error': 'Класс не найден.'}, status=404)
+        Classes.objects.filter(id=class_id).update(isdeleted=True)
+        return JsonResponse({'message': 'Класс успешно удалён.'})
     return JsonResponse({'error': 'Метод не разрешен.'}, status=405)
 
 
@@ -1040,3 +1035,27 @@ def unlink_parents(request, child_id):
 
         return JsonResponse({'success': 'Успешно отвязано.'})
     return JsonResponse({'success': 'Ошибка при отвязывании.'})
+
+
+@csrf_exempt
+def delete_pupil(request, pupil_id):
+    if request.method == 'POST':
+        Pupils.objects.filter(id=pupil_id).update(isdeleted=True)
+        return JsonResponse({'message': 'Класс успешно удалён.'})
+    return JsonResponse({'error': 'Метод не разрешен.'}, status=405)
+
+
+@csrf_exempt
+def delete_parent(request, parent_id):
+    if request.method == 'POST':
+        Parents.objects.filter(id=parent_id).update(isdeleted=True)
+        return JsonResponse({'message': 'Класс успешно удалён.'})
+    return JsonResponse({'error': 'Метод не разрешен.'}, status=405)
+
+
+@csrf_exempt
+def delete_teacher(request, teacher_id):
+    if request.method == 'POST':
+        Teachers.objects.filter(id=teacher_id).update(isdeleted=True)
+        return JsonResponse({'message': 'Класс успешно удалён.'})
+    return JsonResponse({'error': 'Метод не разрешен.'}, status=405)

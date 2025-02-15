@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token }}"> <!-- Добавляем токен здесь -->
-    <title>Редактирование РодителяL</title>
+    <title>Редактирование Родителя</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -84,22 +84,7 @@
             border-radius: 5px;
             box-sizing: border-box;
         }
-<!--        .form-group {-->
-<!--            display: flex;-->
-<!--            margin-bottom: 15px;-->
-<!--        }-->
-<!--        .form-group label {-->
-<!--            width: 200px;-->
-<!--            margin-right: 10px;-->
-<!--            display: flex;-->
-<!--            align-items: center;-->
-<!--        }-->
-<!--        input[type="text"], select {-->
-<!--            padding: 10px;-->
-<!--            border: 1px solid #ccc;-->
-<!--            border-radius: 5px;-->
-<!--            flex-grow: 1;-->
-<!--        }-->
+
         button {
             margin-right: 10px;
             padding: 10px;
@@ -477,7 +462,7 @@
         </tr>
         {% empty %}
         <tr>
-            <td colspan="6" class="no-students"><center>NO DATA TO DISPLAY</center></td>
+            <td colspan="7" class="no-students"><center>NO DATA TO DISPLAY</center></td>
         </tr>
         {% endfor %}
     </tbody>
@@ -575,7 +560,7 @@ function submitForm() {
  function confirmDelete() {
         if (confirm("Вы уверены, что хотите удалить класс?")) {
             const classId = "{{ class_instance.id }}"; // Предполагается, что этот ID доступен в шаблоне
-            fetch(`/evika-school/delete-class/${classId}/`, {
+            fetch(`/evika-school/delete-pupil/${pupilId}/`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': '{{ csrf_token }}'
@@ -583,7 +568,7 @@ function submitForm() {
             })
             .then(response => {
                 if (response.ok) {
-                     window.location.href = "/evika-school/classes/";
+                     window.location.href = "/evika-school/pupils/";
                     return response.json();
                 }
             })

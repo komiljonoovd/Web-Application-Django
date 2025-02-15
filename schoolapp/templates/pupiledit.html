@@ -53,21 +53,10 @@
         .form-group {
             display: flex;
             margin-bottom: 15px;
-<!--        }-->
-<!--        .form-group label {-->
-<!--            width: 200px;-->
-<!--            margin-right: 10px;-->
-<!--            display: flex;-->
-<!--            align-items: center;-->
-<!--        }-->
-<!--        input[type="text"], select {-->
-<!--            padding: 10px;-->
-<!--            border: 1px solid #ccc;-->
-<!--            border-radius: 5px;-->
-<!--            flex-grow: 1;-->
-<!--        }-->
+        }
 
         .form-group input[type="text"],
+        .form-group input[type="number"],
         .form-group select,
         .form-group textarea {
             width: 500px;
@@ -91,6 +80,14 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             width: 60px;
+        }
+        input[type="text"] {
+            width: 100%;
+            max-width: 500px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
         }
         input[type="date"] {
             width: 100%;
@@ -507,7 +504,7 @@
             </div>
             <div class="rows-per-page">
                 <label for="rowsPerPage">Page size:</label>
-                <select id="rowsPerPage" onchange="fetchPupils()">
+                <select id="rowsPerPage" onchange="fetchPupils()" style="width: 60px; padding:10px;">
                     <option value="10" selected>10</option>
                     <option value="15">15</option>
                 </select>
@@ -567,7 +564,7 @@
     </div>
     <div class="rows-per-page">
         <label for="rowsPerPage">Page size:</label>
-        <select id="rowsPerPage" onchange="updateRowsPerPage(this.value)">
+        <select id="rowsPerPage" onchange="updateRowsPerPage(this.value)" style="width: 60px; padding:10px;>
             <option value="10" {% if rows_per_page == 10 %}selected{% endif %}>10</option>
             <option value="15" {% if rows_per_page == 15 %}selected{% endif %}>15</option>
             <option value="20" {% if rows_per_page == 20 %}selected{% endif %}>20</option>
