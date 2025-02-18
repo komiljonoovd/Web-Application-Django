@@ -109,7 +109,7 @@ def edit_class(request, pk):
 
     form = ClassForm(instance=class_instance)
 
-    pupils_list = Pupils.objects.filter(classes=class_instance).order_by('id')
+    pupils_list = Pupils.objects.filter(classes=class_instance).order_by('first_name')
 
     page_number = request.GET.get('page', 1)
     rows_per_page = request.GET.get('rows_per_page', 10)
