@@ -602,19 +602,37 @@ function createNewPupil() {
     console.log("Создание нового ученика");
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-        const birthdayField = document.getElementById("id_birthday");
-        if (birthdayField) {
-            // Устанавливаем атрибуты для поля даты
-            birthdayField.setAttribute("type", "date");
-            birthdayField.setAttribute("placeholder", "гггг-мм-дд");
-            birthdayField.classList.add("form-control");
+<!--document.addEventListener("DOMContentLoaded", function () {-->
+<!--        const birthdayField = document.getElementById("id_birthday");-->
+<!--        if (birthdayField) {-->
+<!--            // Устанавливаем атрибуты для поля даты-->
+<!--            birthdayField.setAttribute("type", "date");-->
+<!--            birthdayField.setAttribute("placeholder", "гггг-мм-дд");-->
+<!--            birthdayField.classList.add("form-control");-->
 
-            // Задаем минимальную и максимальную дату (опционально)
-            const today = new Date().toISOString().split("T")[0];
-            birthdayField.setAttribute("max", today);
-        }
+<!--            // Задаем минимальную и максимальную дату (опционально)-->
+<!--            const today = new Date().toISOString().split("T")[0];-->
+<!--            birthdayField.setAttribute("max", today);-->
+<!--        }-->
+<!--    });-->
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("editClassForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Блокируем стандартную отправку формы
+        submitForm(); // Вызываем AJAX-отправку
     });
+
+    const birthdayField = document.getElementById("id_birthday");
+    if (birthdayField) {
+        birthdayField.type = "date";
+        birthdayField.placeholder = "гггг-мм-дд";
+        birthdayField.classList.add("form-control");
+
+        const today = new Date().toISOString().split("T")[0];
+        birthdayField.max = today;
+    }
+});
+
 
 
 
@@ -1001,10 +1019,10 @@ function linkSelectedPupils() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Ученики успешно привязаны!');
+                alert('Успешно привязано !');
                 location.reload();
             } else {
-                alert('Ошибка при привязке учеников.');
+                alert('Ошибка при привязке !');
             }
         })
         .catch(error => console.error('Ошибка:', error));
