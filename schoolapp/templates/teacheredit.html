@@ -830,7 +830,7 @@ function linkSelectedPupils() {
     const classId = document.getElementById('classIdInput').value; // Получаем ID класса
 
     if (selectedPupils.length === 0) {
-        alert('Выберите хотя бы одного ученика для привязки.');
+        alert('Выберите хотя бы одного учителя для привязки.');
         return;
     }
 
@@ -845,10 +845,10 @@ function linkSelectedPupils() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Ученики успешно привязаны!');
+                alert('Успешно привязано !');
                 location.reload();
             } else {
-                alert('Ошибка при привязке учеников.');
+                alert('Ошибка при привязке !');
             }
         })
         .catch(error => console.error('Ошибка:', error));
